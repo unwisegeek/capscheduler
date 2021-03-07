@@ -48,19 +48,34 @@ def getdatesbyday(day, month, year):
         while testdate.month == month:
             if testdate.weekday() == day:
                 yield testdate
-                #results += [ testdate ]
                 testdate += timedelta(days=7)
             else: 
                 testdate += timedelta(days=1)
-        return results
     if month == 13:
         testdate = date(year, 1, 1)
         while testdate.year() == year:
             if testdate.weekday() == day:
-                results += [ testdate ]
-            testdate += timedelta(days=7)
-        return results
-    return [ '9999-09-09' ]
+                yield testdate
+                testdate += timedelta(days=7)
+            else:
+                testdate += timedelta(days=1)
+
+def update_date_list():
+        date_items = []
+        target_year = int(year_listbox.get_cur_line())
+        target_month = monthnum(month_listbox.get_cur_line().strip(' '))
+        for i in getdatesbyday(4, target_month, target_year):
+            date_items += [ i.strftime('%m-%d-%Y') ]
+        date_listbox = WListBox(10, mr - 9, date_items)
+        d.add(2, 5, date_listbox)
+
+def year_changed(w):
+    update_date_list()
+    d.redraw()
+
+def month_changed(w):
+    update_date_list()
+    d.redraw()
 
 s = Screen()
 t = datetime.now()
@@ -94,33 +109,17 @@ with Context():
     # Write the meeting dates out in the panel.
     # dates_items
 
-    target_year = int(year_listbox.get_cur_line())
-    target_month = monthnum(month_listbox.get_cur_line().strip(' '))
-
     d.add(2, 4, "-----------")
     for each in range(2, mr - 5):
         d.add(16, each, '|')
         d.add(mc * .3, each, '|')
         d.add(mc * .7, each, '|')
 
-    def update_date_list():
-        date_items = []
-        for i in getdatesbyday(4, target_month, target_year):
-            date_items += [ i.strftime('%m-%d-%Y') ]
-        date_listbox = WListBox(10, mr - 9, date_items)
-        d.add(2, 5, date_listbox)
-
+    target_year = int(year_listbox.get_cur_line())
+    target_month = monthnum(month_listbox.get_cur_line().strip(' '))
     update_date_list()
 
     # Handle year and month changes
-    def year_changed(w):
-        update_date_list()
-        d.redraw()
-
-    def month_changed(w):
-        update_date_list()
-        d.redraw()
-    
     year_listbox.on("changed", year_changed)
     month_listbox.on("changed", month_changed)
 
