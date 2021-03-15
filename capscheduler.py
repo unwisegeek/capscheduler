@@ -14,6 +14,7 @@ DAYNUM = { 'Monday': 0,
 }
 
 DATEFMT = '%m-%d-%Y'
+meetingDay = 'Thursday'
     
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -23,7 +24,7 @@ def index():
         return redirect('/schedule?meetingDate={}'.format(meetingDate))
     else: # Pick the next day that coincides with the meeting day.
         nextMeetingDay = date.today()
-        while nextMeetingDay.weekday() != DAYNUM['Thursday']:
+        while nextMeetingDay.weekday() != DAYNUM[meetingDay]:
             nextMeetingDay += timedelta(1)
         meetingDate = nextMeetingDay.strftime(DATEFMT)
         return redirect('/schedule?meetingDate={}'.format(meetingDate))
