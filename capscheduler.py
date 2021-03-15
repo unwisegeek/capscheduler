@@ -31,6 +31,7 @@ class Event(db.Model):
     isEmailScheduled = db.Column(db.Integer, unique=False, nullable=False)
     isEmailSent = db.Column(db.Integer, unique=False, nullable=False)
     isEmailConfirmed = db.Column(db.Integer, unique=False, nullable=False)
+    isEventDeleted = db.Column(db.Integer, unique=False, nullable=False)
 
 # Initialize the database file if one does not exist.
 if not os.path.exists('capscheduler.db'):
@@ -64,6 +65,39 @@ def schedule_window():
     else:
         # Redirect if the date has not been set.
         redirect('/')
+
+@app.route('/newevent', methods=['GET', 'POST'])
+def newevent():
+    # Check that all variables that are needed to create an event in the database are there.
+    allVarsExist = True
+    for each in [ "eventDate", "startTime", "stopTime", "eventName", "eventLdr", "isConfirmed", "isEmailScheduled", "isEmailSent", "isEmailConfirmed" ]:
+        if each not in request.values:
+            allVarsExist = False
+    if allVarsExist:
+        # Create list of variable values.
+        data[0] = request.values.get('eventDate')
+        data[1] = request.values.get('startTime')
+        data[2] = request.values.get('stopTime')
+        data[3] = request.values.get('eventName')
+        data[4] = request.values.get('eventLdr')
+        data[5] = request.values.get('isConfirmed')
+        data[6] = request.values.get('isEmailScheduled')
+        data[7] = request.values.get('isEmailSent')
+        data[8] = request.values.get('isEmailConfirmed')
+        data[9] = request.values.get('isDeleted')
+        # Create a new DB entry.
+        newevent = Event(eventDate=data[0], startTime=data[1], stopTime=data[2], eventName=data[3], eventLdr=data[5], \
+                         isConfirmed=data[6], isEmailScheduled=data[7], isEmailSent=data[8], isEmailConfirmed=data[8], \
+                         isDeleted=data[9])
+        # Commit the DB entry and send them back to the index page with the previous date.
+        db.session.add(newevent)
+        db.session.commit()
+        newevent = ""
+        # Redirect
+        meetingDate = request.values.get('meetingDate')
+        redirect('/schedule?meetingDate={}'.format(meetingDate))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
