@@ -21,13 +21,15 @@ meetingDay = 'Thursday'
 
 # Create the event model for the database.
 class Event(db.Model):
+    __tablename__ = 'events'
+    __table_args__ = { 'sqlite_autoincrement': True }
     eventId = db.Column(db.Integer, primary_key=True)
     eventDate = db.Column(db.String(10), unique=False, nullable=False)
     startTime = db.Column(db.String(5), unique=False, nullable=False)
     stopTime = db.Column(db.String(5), unique=False, nullable=False)
     eventName = db.Column(db.String(80), unique=False, nullable=False)
     eventLdr = db.Column(db.String(80), unique=False, nullable=False)
-    isConfirmed = db.Column(db.Integer, unique=False, nullable=False)
+    isAgreedTo = db.Column(db.Integer, unique=False, nullable=False)
     isEmailScheduled = db.Column(db.Integer, unique=False, nullable=False)
     isEmailSent = db.Column(db.Integer, unique=False, nullable=False)
     isEmailConfirmed = db.Column(db.Integer, unique=False, nullable=False)
@@ -80,14 +82,14 @@ def newevent():
         data[2] = request.values.get('stopTime')
         data[3] = request.values.get('eventName')
         data[4] = request.values.get('eventLdr')
-        data[5] = request.values.get('isConfirmed')
+        data[5] = request.values.get('isAgreedTo')
         data[6] = request.values.get('isEmailScheduled')
         data[7] = request.values.get('isEmailSent')
         data[8] = request.values.get('isEmailConfirmed')
         data[9] = request.values.get('isDeleted')
         # Create a new DB entry.
         newevent = Event(eventDate=data[0], startTime=data[1], stopTime=data[2], eventName=data[3], eventLdr=data[5], \
-                         isConfirmed=data[6], isEmailScheduled=data[7], isEmailSent=data[8], isEmailConfirmed=data[8], \
+                         isAgreedTo=data[6], isEmailScheduled=data[7], isEmailSent=data[8], isEmailConfirmed=data[8], \
                          isDeleted=data[9])
         # Commit the DB entry and send them back to the index page with the previous date.
         db.session.add(newevent)
