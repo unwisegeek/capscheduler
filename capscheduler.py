@@ -7,11 +7,6 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler.db'
 db = SQLAlchemy(app)
 
-# Create the database file if one does not exist.
-if not os.path.exists('capscheduler.db'):
-    print("Creating database.")
-    db.create_all()
-
 DAYNUM = { 'Monday': 0,
                'Tuesday': 1,
                'Wednesday': 2,
@@ -23,6 +18,24 @@ DAYNUM = { 'Monday': 0,
 
 DATEFMT = '%m-%d-%Y'
 meetingDay = 'Thursday'
+
+# Create the event model for the database.
+class Event(db.Model):
+    eventId = db.Column(db.Integer, primary_key=True)
+    eventDate = db.Column(db.String(10), unique=False, nullable=False)
+    startTime = db.Column(db.String(5), unique=False, nullable=False)
+    stopTime = db.Column(db.String(5), unique=False, nullable=False)
+    eventName = db.Column(db.string(80), unique=False, nullable=False)
+    eventLdr = db.Column(db.string(80), unique=False, nullable=False)
+    isConfirmed = db.Column(db.Integer, unique=False, nullable=False)
+    isEmailScheduled = db.Column(db.Integer, unique=False, nullable=False)
+    isEmailSent = db.Column(db.Integer, unique=False, nullable=False)
+    isEmailConfirmed = db.Column(db.Integer, unique=False, nullable=False)
+
+# Initialize the database file if one does not exist.
+if not os.path.exists('capscheduler.db'):
+    print("Creating database.")
+    db.create_all()
     
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -49,8 +62,8 @@ def schedule_window():
         meetingDate = meetingDate.strftime('%Y-%m-%d')
         return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate)
     else:
-        # Return an error if the date has not been set.
-        return '', 400
+        # Redirect if the date has not been set.
+        redirect('/')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
