@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block style %}
+.dateNav {
+    display: table;
+    margin: 0 auto;
+}
+{% endblock %}
+
+{% block body %}
+<div class="dateNav">
+<table>
+    <tr>
+        <td><button onclick="window.location.href='/schedule?meetingDate={{ prevDate }}'"><<</button></td>
+        <td><form style="display: table;" action="/schedule">
+            <input type="date" id="meetingDate" name="meetingDate" value="{{ meetingDate }}">
+            <input type="submit" value="Submit">
+            </form>
+        </td>
+        <td><button onclick="window.location.href='/schedule?meetingDate={{ nextDate }}'">>></button></td>
+    </tr>
+    <tr>
+        <td>
+        </td>
+    </tr>
+</table>
+</div>
+{% endblock %}
