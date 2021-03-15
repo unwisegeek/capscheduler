@@ -1,8 +1,16 @@
+import os
 from flask import Flask, render_template, request, redirect
 from datetime import datetime, date, timedelta
-# from flask_sqlalchemy import flask_sqlalchemy
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler.db'
+db = SQLAlchemy(app)
+
+# Create the database file if one does not exist.
+if not os.path.exists('capscheduler.db'):
+    print("Creating database.")
+    db.create_all()
 
 DAYNUM = { 'Monday': 0,
                'Tuesday': 1,
