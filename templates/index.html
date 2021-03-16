@@ -25,4 +25,90 @@
     </tr>
 </table>
 </div>
+<hr>
+<table style="margin: 0 auto; width: 100%; text-align: center;">
+    <tr>
+        <th><center>New Event:</center></th>
+    </tr>
+    <tr>
+        <th>Event ID</th>
+        <th>Event Date</th>
+        <th>Start Time</th>
+        <th>Stop Time</th>
+        <th>Event Name</th>
+        <th>Event Leader</th>
+        <th>Event Agreed To</th>
+        <th>Conf. Email Scheduled</th>
+        <th>Conf. Email Sent</th>
+        <th>Confirmation Rcvd</th>
+        <th>Options</th>
+    </tr>
+    <tr>
+    {% for result in results %}
+    <tr>
+        {% for elem in result %}
+        <td>{{ elem }}</td>
+        {% endfor %}
+        <td><a href='/delete?eventId={{ result[0] }}'>Delete</a></td>
+    </tr>
+    {% endfor %}
+    </tr>
+</table>
+<hr>
+<table style="margin: 0 auto; width: 100%; text-align: center;">
+    <tr>
+        <th style="text-align: center; font-size: 25px;">New Event</th>
+    </tr>
+    <tr>
+        <th>Event Date</th>
+        <th>Start Time</th>
+        <th>Stop Time</th>
+        <th>Event Name</th>
+        <th>Event Leader</th>
+        <th>Event Agreed To</th>
+        <th>Conf. Email Scheduled</th>
+        <th>Conf. Email Sent</th>
+        <th>Confirmation Rcvd</th>
+    </tr>
+    <form action="/newevent?meetingDate={{ meetingDate }}">
+    <tr>
+        <td><input type="date" id="eventDate" name="eventDate" value="{{ meetingDate }}"></td>
+        <td><input type="text" id="startTime" name="startTime" value="17:00"></td>
+        <td><input type="text" id="stopTime" name="stopTime" value="18:00"></td>
+        <td><input type="text" id="eventName" name="eventName" value=""></td>
+        <td><input type="text" id="eventLdr" name="eventLdr" value=""></td>
+        <td>
+            <input type="radio" id="false" name="isAgreedTo" value="0">
+            <label for="false">False</label><br>
+            <input type="radio" id="true" name="isAgreedTo" value="1">
+            <label for="true">True</label>
+        </td>
+        <td>
+            <input type="radio" id="false" name="isEmailScheduled" value="0">
+            <label for="false">False</label><br>
+            <input type="radio" id="true" name="isEmailScheduled" value="1">
+            <label for="true">True</label>
+        </td>
+        <td>
+            <input type="radio" id="false" name="isEmailSent" value="0">
+            <label for="false">False</label><br>
+            <input type="radio" id="true" name="isEmailSent" value="1">
+            <label for="true">True</label>
+        </td>
+        <td>
+            <input type="radio" id="false" name="isEmailConfirmed" value="0">
+            <label for="false">False</label><br>
+            <input type="radio" id="true" name="isEmailConfirmed" value="1">
+            <label for="true">True</label>
+        </td>
+        <td>
+            <input type="hidden" id="isDeleted" name="isDeleted" value="0">
+            <input type="hidden" id="meetingDate" name="meetingDate" value="{{ meetingDate }}">
+            <input type="reset" value="Clear">
+            <!-- <input type="submit" value="Add Event"> -->
+            <button type="submit" formmethod="post">Add Event</button>
+        </td>
+    </tr>
+</form>
+</table>
 {% endblock %}
