@@ -56,7 +56,11 @@ def index():
 
 @app.route('/schedule', methods=['GET', 'POST'])
 def schedule_window():
-    if "meetingDate" in request.values:
+    if 'status' in request.values:
+        pageStatus = request.values.get('status')
+    else:
+        pageStatus = ''
+    if 'meetingDate' in request.values:
         meetingDate = request.values.get('meetingDate')
         # Account for meetingDate coming back in a different format
         if meetingDate[3] == '-': # Month First
@@ -85,7 +89,7 @@ def schedule_window():
                                                              queryResults[i].isAgreedTo, queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, \
                                                              queryResults[i].isEmailConfirmed)
                 sortedQueryResults += [ row.split('|') ]
-        return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults)
+        return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus)
     else:
         # Redirect if the date has not been set.
         return redirect('/')
@@ -94,6 +98,7 @@ def schedule_window():
 def newevent():
     # Check that all variables that are needed to create an event in the database are there.
     allVarsExist = True
+    meetingDate = request.values.get('meetingDate')
     for each in [ "eventDate", "startTime", "stopTime", "eventName", "eventLdr", "isAgreedTo", "isEmailScheduled", "isEmailSent", "isEmailConfirmed" ]:
         if each not in request.values:
             allVarsExist = False
@@ -119,9 +124,8 @@ def newevent():
         db.session.commit()
         newevent = ""
         # Redirect
-        meetingDate = request.values.get('meetingDate')
-        return redirect('/schedule?meetingDate={}'.format(meetingDate))
-    return ""
+        return redirect('/schedule?meetingDate={}&status=Event%20Added'.format(meetingDate))
+    return redirect('/schedule?meetingDate={}&status=Error%20Adding%20Event.format(')
 
 
 if __name__ == '__main__':
