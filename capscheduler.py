@@ -38,7 +38,7 @@ class Event(db.Model):
 
 # Initialize the database file if one does not exist.
 if not os.path.exists('capscheduler.db'):
-    print("Creating database.")
+    print('Creating database.')
     db.create_all()
     
 @app.route('/', methods=['GET', 'POST'])
@@ -84,7 +84,7 @@ def schedule_window():
                 break
         for i in range(0, counter):
             if queryResults[i].isDeleted != 1:
-                row = "{}|{}|{}|{}|{}|{}|{}|{}|{}|{}".format(queryResults[i].eventId, queryResults[i].eventDate, queryResults[i].startTime, \
+                row = '{}|{}|{}|{}|{}|{}|{}|{}|{}|{}'.format(queryResults[i].eventId, queryResults[i].eventDate, queryResults[i].startTime, \
                                                              queryResults[i].stopTime, queryResults[i].eventName, queryResults[i].eventLdr, \
                                                              queryResults[i].isAgreedTo, queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, \
                                                              queryResults[i].isEmailConfirmed)
@@ -99,7 +99,7 @@ def newevent():
     # Check that all variables that are needed to create an event in the database are there.
     allVarsExist = True
     meetingDate = request.values.get('meetingDate')
-    for each in [ "eventDate", "startTime", "stopTime", "eventName", "eventLdr", "isAgreedTo", "isEmailScheduled", "isEmailSent", "isEmailConfirmed" ]:
+    for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr', 'isAgreedTo', 'isEmailScheduled', 'isEmailSent', 'isEmailConfirmed' ]:
         if each not in request.values:
             allVarsExist = False
     if allVarsExist:
@@ -122,7 +122,7 @@ def newevent():
         # Commit the DB entry and send them back to the index page with the previous date.
         db.session.add(newevent)
         db.session.commit()
-        newevent = ""
+        newevent = ''
         # Redirect
         return redirect('/schedule?meetingDate={}&status=Event%20Added'.format(meetingDate))
     return redirect('/schedule?meetingDate={}&status=Error%20Adding%20Event.format(')
