@@ -28,23 +28,32 @@
 <hr>
 <table style="margin: 0 auto; width: 100%; text-align: center;">
     <tr>
-        <th>Event ID</th>
-        <th>Event Date</th>
-        <th>Start Time</th>
-        <th>Stop Time</th>
+        <th>ID</th>
+        <th>Event</th>
+        <th>Start</th>
+        <th>Stop</th>
         <th>Event Name</th>
-        <th>Event Leader</th>
-        <th>Event Agreed To</th>
-        <th>Conf. Email Scheduled</th>
-        <th>Conf. Email Sent</th>
-        <th>Confirmation Rcvd</th>
+        <th>Leader</th>
+        <th>Agreed To</th>
+        <th>Conf. Scheduled</th>
+        <th>Conf. Sent</th>
+        <th>Conf. Rcvd</th>
         <th>Options</th>
     </tr>
     <tr>
     {% for result in results %}
     <tr>
         {% for elem in result %}
-        <td>{{ elem }}</td>
+        <td>
+            {% if elem == '0' %}&#9744
+            {% else %}
+                {% if elem == '1' %}
+                    &#9745
+                {% else %}
+                    {{ elem }}
+                {% endif %}
+            {% endif %}
+        </td>
         {% endfor %}
         <td>
             <form action="/schedule?meetingDate={{ meetingDate }}&eventId={{ result[0] }}&pageAction=EditEvent" method="post">

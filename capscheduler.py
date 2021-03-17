@@ -30,6 +30,12 @@ def result_length(set):
             break
     return counter
 
+def convert_bool_to_ballot(targValue):
+    if targValue == 1:
+        return "&#9744"
+    else:
+        return "&#9745"
+
 # Create the event model for the database.
 class Event(db.Model):
     __tablename__ = 'events'
