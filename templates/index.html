@@ -94,28 +94,16 @@
         <td><input type="text" id="eventName" name="eventName" value=""></td>
         <td><input type="text" id="eventLdr" name="eventLdr" value=""></td>
         <td>
-            <input type="radio" id="false" name="isAgreedTo" value="0">
-            <label for="false">False</label><br>
-            <input type="radio" id="true" name="isAgreedTo" value="1">
-            <label for="true">True</label>
+            <input type="checkbox" id="isAgreedTo" name="isAgreedTo" value="1">
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailScheduled" value="0">
-            <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailScheduled" value="1">
-            <label for="true">True</label>
+            <input type="checkbox" id="isEmailScheduled" name="isEmailScheduled" value="1">
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailSent" value="0">
-            <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailSent" value="1">
-            <label for="true">True</label>
+            <input type="checkbox" id="isEmailSent" name="isEmailSent" value="1">
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailConfirmed" value="0">
-            <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailConfirmed" value="1">
-            <label for="true">True</label>
+            <input type="checkbox" id="isEmailConfirmed" name="isEmailConfirmed" value="1">
         </td>
         <td>
             <input type="hidden" id="isDeleted" name="isDeleted" value="0">
@@ -152,28 +140,16 @@
         <td><input type="text" id="eventName" name="eventName" value="{{ eventData[4] }}"></td>
         <td><input type="text" id="eventLdr" name="eventLdr" value="{{ eventData[5] }}"></td>
         <td>
-            <input type="radio" id="false" name="isAgreedTo" value="0" {% if eventData[6] == 0 %}checked{% endif %}>
-            <label for="false">False</label><br>
-            <input type="radio" id="true" name="isAgreedTo" value="1" {% if eventData[6] == 1 %}checked{% endif %}>
-            <label for="true">True</label>
+            <input type="checkbox" id="isAgreedTo" name="isAgreedTo" value="1" {% if eventData[6] == 1 %}checked{% endif %}>
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailScheduled" value="0" {% if eventData[7] == 0 %}checked{% endif %}>
-            <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailScheduled" value="1" {% if eventData[7] == 1 %}checked{% endif %}>
-            <label for="true">True</label>
+            <input type="checkbox" id="isEmailScheduled" name="isEmailScheduled" value="1" {% if eventData[7] == 1 %}checked{% endif %}>
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailSent" value="0" {% if eventData[8] == 0 %}checked{% endif %}>
-            <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailSent" value="1" {% if eventData[8] == 1 %}checked{% endif %}>
-            <label for="true">True</label>
+            <input type="checkbox" id="isEmailSent" name="isEmailSent" value="1" {% if eventData[8] == 1 %}checked{% endif %}>
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailConfirmed" value="0" {% if eventData[9] == 0 %}checked{% endif %}>
-            <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailConfirmed" value="1" {% if eventData[9] == 1 %}checked{% endif %}>
-            <label for="true">True</label>
+            <input type="checkbox" id="isEmailConfirmed" name="isEmailConfirmed" value="1" {% if eventData[9] == 1 %}checked{% endif %}>
         </td>
         <td>
             <input type="hidden" id="eventId" name="eventId" value="{{ eventData[0] }}">

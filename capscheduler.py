@@ -128,13 +128,13 @@ def schedule_window():
 
 @app.route('/newevent', methods=['GET', 'POST'])
 def newevent():
-    # Check that all variables that are needed to create an event in the database are there.
-    allVarsExist = True
+    # Check that all required variables that are needed to create an event in the database are there.
+    reqVarsExist = True
     meetingDate = request.values.get('meetingDate')
-    for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr', 'isAgreedTo', 'isEmailScheduled', 'isEmailSent', 'isEmailConfirmed' ]:
+    for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr', 'isDeleted' ]:
         if each not in request.values:
-            allVarsExist = False
-    if allVarsExist:
+            reqVarsExist = False
+    if reqVarsExist:
         # Create list of variable values.
         data = []
         data += [ request.values.get('eventDate') ]
@@ -142,11 +142,27 @@ def newevent():
         data += [ request.values.get('stopTime') ]
         data += [ request.values.get('eventName') ]
         data += [ request.values.get('eventLdr') ]
-        data += [ request.values.get('isAgreedTo') ]
-        data += [ request.values.get('isEmailScheduled') ]
-        data += [ request.values.get('isEmailSent') ]
-        data += [ request.values.get('isEmailConfirmed') ]
-        data += [ request.values.get('isDeleted') ]
+
+        if 'isAgreedTo' in request.values:
+            data += [ 1 ]
+        else:
+            data += [ 0 ]
+        
+        if 'isEmailScheduled' in request.values:
+            data += [ 1 ]
+        else:
+            data += [ 0 ]
+
+        if 'isEmailSent' in request.values:
+            data += [ 1 ]
+        else:
+            data += [ 0 ]
+        
+        if 'isEmailConfirmed' in request.values:
+            data += [ 1 ]
+        else:
+            data += [ 0 ]
+
         # Create a new DB entry.
         newevent = Event(eventDate=data[0], startTime=data[1], stopTime=data[2], eventName=data[3], eventLdr=data[4], \
                          isAgreedTo=data[5], isEmailScheduled=data[6], isEmailSent=data[7], isEmailConfirmed=data[8], \
@@ -163,13 +179,19 @@ def newevent():
 def deleteevent():
     meetingDate = request.values.get('meetingDate')
     id = request.values.get('eventId')
-    Event.query.filter_by(eventId=int(id)).delete()
+    eventobj = Event.query.filter_by(eventId=int(id)).first()
+    eventobj.isDeleted = 1
     db.session.commit()
     status = 'Event Deleted'
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
 
 @app.route('/edit', methods=['POST'])
 def editevent():
+    def isin(flag):
+        if flag in request.values:
+            return request.values.get(flag)
+        else:
+            return 0
     meetingDate = request.values.get('meetingDate')
     id = request.values.get('eventId')
     status = "Event Updated"
@@ -179,11 +201,12 @@ def editevent():
     event.stopTime = request.values.get('stopTime')
     event.eventName = request.values.get('eventName')
     event.eventLdr = request.values.get('eventLdr')
-    event.isAgreedTo = request.values.get('isAgreedTo')
-    event.isEmailScheduled = request.values.get('isEmailScheduled')
-    event.isEmailSent = request.values.get('isEmailSent')
-    event.isEmailConfirmed = request.values.get('isEmailConfirmed')
-    event.isEmailDeleted = request.values.get('isDeleted')
+
+    event.isAgreedTo = isin('isAgreedTo')
+    event.isEmailScheduled = isin('isEmailScheduled')
+    event.isEmailSent = isin('isEmailSent')
+    event.isEmailConfirmed = isin('isEmailConfirmed')
+    event.isEmailDeleted = isin('isDeleted')
     db.session.commit()
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
 
