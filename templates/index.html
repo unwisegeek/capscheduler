@@ -47,8 +47,6 @@
         <td>{{ elem }}</td>
         {% endfor %}
         <td>
-            <!-- <a href='/edit?meetingDate={{ meetingDate }}&eventId={{ result[0] }}'>Edit</a> -->
-            <!-- <a href='/delete?meetingDate={{ meetingDate }}&eventId={{ result[0] }}' onclick="return confirm('Are you sure you want to delete this event?')">Delete</a></td> -->
             <form action="/edit?meetingDate={{ meetingDate }}&eventId={{ result[0] }}" method="post">
                 <input type="hidden" name="meetingDate" id="meetingDate" value="{{ meetingDate }}">
                 <input type="hidden" name="eventId" id="eventId" value="{{ result[0] }}">
