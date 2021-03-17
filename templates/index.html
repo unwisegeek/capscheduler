@@ -46,11 +46,13 @@
         {% for elem in result %}
         <td>{{ elem }}</td>
         {% endfor %}
-        <td><a href='/delete?eventId={{ result[0] }}'>Delete</a></td>
+        <td><a href='/delete?meetingDate={{ meetingDate }}&eventId={{ result[0] }}'>Delete</a></td>
     </tr>
     {% endfor %}
     </tr>
 </table>
+<p style="text-align: center;"><a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a></p>
+{% if pageAction == 'AddEvent' %}
 <hr>
 <h1 style="text-align: center;">New Event</h1>
 <table style="margin: 0 auto; width: 100%; text-align: center;">
@@ -106,5 +108,6 @@
     </tr>
 </form>
 </table>
+{% endif %}
 <p style="text-align: center; color: red">{{ status }}</p>
 {% endblock %}
