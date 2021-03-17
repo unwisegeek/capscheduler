@@ -135,7 +135,7 @@
         <th>Conf. Email Sent</th>
         <th>Confirmation Rcvd</th>
     </tr>
-    <form action="/newevent?meetingDate={{ meetingDate }}">
+    <form action="/editevent">
     <tr>
         <td><input type="date" id="eventDate" name="eventDate" value="{{ eventData[1] }}"></td>
         <td><input type="text" id="startTime" name="startTime" value="{{ eventData[2] }}"></td>
@@ -167,11 +167,12 @@
             <label for="true">True</label>
         </td>
         <td>
+            <input type="hidden" id="eventId" name="eventId" value="{{ eventData[0] }}">
             <input type="hidden" id="isDeleted" name="isDeleted" value="0">
             <input type="hidden" id="meetingDate" name="meetingDate" value="{{ meetingDate }}">
             <input type="reset" value="Clear">
             <!-- <input type="submit" value="Add Event"> -->
-            <button type="submit" formmethod="post" onclick="return confirm('Are you sure you want to add this event?')">Add Event</button>
+            <button type="submit" formmethod="post" onclick="return confirm('Are you sure you want to edit this event with the values in the fields below?')">Edit Event</button>
         </td>
     </tr>
 </form>
