@@ -46,7 +46,9 @@
         {% for elem in result %}
         <td>{{ elem }}</td>
         {% endfor %}
-        <td><a href='/delete?meetingDate={{ meetingDate }}&eventId={{ result[0] }}'>Delete</a></td>
+        <td>
+            <a href='/edit?meetingDate={{ meetingDate }}&eventId={{ result[0] }}'>Edit</a>
+            <a href='/delete?meetingDate={{ meetingDate }}&eventId={{ result[0] }}' onclick="return confirm('Are you sure you want to delete this event?')">Delete</a></td>
     </tr>
     {% endfor %}
     </tr>
@@ -78,6 +80,63 @@
             <input type="radio" id="false" name="isAgreedTo" value="0">
             <label for="false">False</label><br>
             <input type="radio" id="true" name="isAgreedTo" value="1">
+            <label for="true">True</label>
+        </td>
+        <td>
+            <input type="radio" id="false" name="isEmailScheduled" value="0">
+            <label for="false">False</label><br>
+            <input type="radio" id="true" name="isEmailScheduled" value="1">
+            <label for="true">True</label>
+        </td>
+        <td>
+            <input type="radio" id="false" name="isEmailSent" value="0">
+            <label for="false">False</label><br>
+            <input type="radio" id="true" name="isEmailSent" value="1">
+            <label for="true">True</label>
+        </td>
+        <td>
+            <input type="radio" id="false" name="isEmailConfirmed" value="0">
+            <label for="false">False</label><br>
+            <input type="radio" id="true" name="isEmailConfirmed" value="1">
+            <label for="true">True</label>
+        </td>
+        <td>
+            <input type="hidden" id="isDeleted" name="isDeleted" value="0">
+            <input type="hidden" id="meetingDate" name="meetingDate" value="{{ meetingDate }}">
+            <input type="reset" value="Clear">
+            <!-- <input type="submit" value="Add Event"> -->
+            <button type="submit" formmethod="post">Add Event</button>
+        </td>
+    </tr>
+</form>
+</table>
+{% endif %}
+{% if pageAction == 'EditEvent' %}
+<hr>
+<h1 style="text-align: center;">Edit Event</h1>
+<table style="margin: 0 auto; width: 100%; text-align: center;">
+    <tr>
+        <th>Event Date</th>
+        <th>Start Time</th>
+        <th>Stop Time</th>
+        <th>Event Name</th>
+        <th>Event Leader</th>
+        <th>Event Agreed To</th>
+        <th>Conf. Email Scheduled</th>
+        <th>Conf. Email Sent</th>
+        <th>Confirmation Rcvd</th>
+    </tr>
+    <form action="/newevent?meetingDate={{ meetingDate }}">
+    <tr>
+        <td><input type="date" id="eventDate" name="eventDate" value="{{ meetingDate }}"></td>
+        <td><input type="text" id="startTime" name="startTime" value="{{ startTime }}"></td>
+        <td><input type="text" id="stopTime" name="stopTime" value="{{ stopTime }}"></td>
+        <td><input type="text" id="eventName" name="eventName" value="{{ eventName }}"></td>
+        <td><input type="text" id="eventLdr" name="eventLdr" value="{{ eventLdr }}"></td>
+        <td>
+            <input type="radio" id="false" name="isAgreedTo" value="0" {% if 'isAgreedTo' == 0 %}checked{% endif %}>
+            <label for="false">False</label><br>
+            <input type="radio" id="true" name="isAgreedTo" value="1" {% if 'isAgreedTo' == 1 %}checked{% endif %}>
             <label for="true">True</label>
         </td>
         <td>
