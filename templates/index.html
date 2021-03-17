@@ -118,6 +118,7 @@
     </tr>
 </form>
 </table>
+<hr>
 {% endif %}
 {% if pageAction == 'EditEvent' %}
 <hr>
@@ -170,11 +171,12 @@
             <input type="hidden" id="meetingDate" name="meetingDate" value="{{ meetingDate }}">
             <input type="reset" value="Clear">
             <!-- <input type="submit" value="Add Event"> -->
-            <button type="submit" formmethod="post">Add Event</button>
+            <button type="submit" formmethod="post" onclick="return confirm('Are you sure you want to add this event?'>Add Event</button>
         </td>
     </tr>
 </form>
 </table>
+<hr>
 {% endif %}
 <p style="text-align: center; color: red">{{ status }}</p>
 {% endblock %}
