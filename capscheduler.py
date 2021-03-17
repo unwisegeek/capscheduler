@@ -20,6 +20,16 @@ DAYNUM = { 'Monday': 0,
 DATEFMT = '%Y-%m-%d'
 meetingDay = 'Thursday'
 
+def result_length(set):
+    counter = 0
+    while True:
+        try:
+            a = set[counter].eventId
+            counter += 1
+        except:
+            break
+    return counter
+
 # Create the event model for the database.
 class Event(db.Model):
     __tablename__ = 'events'
@@ -60,6 +70,10 @@ def schedule_window():
         pageStatus = request.values.get('status')
     else:
         pageStatus = ''
+    if 'pageAction' in request.values:
+        pageAction = request.values.get('pageAction')
+    else:
+        pageAction = ''
     if 'meetingDate' in request.values:
         meetingDate = request.values.get('meetingDate')
         # Account for meetingDate coming back in a different format
@@ -75,13 +89,7 @@ def schedule_window():
         # Get results from DB
         queryResults = Event.query.filter_by(eventDate=meetingDate)
         sortedQueryResults = []
-        counter = 0
-        while True:
-            try:
-                a = queryResults[counter].eventId
-                counter += 1
-            except:
-                break
+        counter = result_length(queryResults)
         for i in range(0, counter):
             if queryResults[i].isDeleted != 1:
                 row = '{}|{}|{}|{}|{}|{}|{}|{}|{}|{}'.format(queryResults[i].eventId, queryResults[i].eventDate, queryResults[i].startTime, \
@@ -89,7 +97,8 @@ def schedule_window():
                                                              queryResults[i].isAgreedTo, queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, \
                                                              queryResults[i].isEmailConfirmed)
                 sortedQueryResults += [ row.split('|') ]
-        return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus)
+        return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus,
+                                pageAction=pageAction)
     else:
         # Redirect if the date has not been set.
         return redirect('/')
@@ -126,6 +135,16 @@ def newevent():
         # Redirect
         return redirect('/schedule?meetingDate={}&status=Event%20Added'.format(meetingDate))
     return redirect('/schedule?meetingDate={}&status=Error%20Adding%20Event.format(')
+
+@app.route('/delete', methods=['GET', 'POST'])
+def deleteevent():
+    meetingDate = request.values.get('meetingDate')
+    id = request.values.get('eventId')
+    Event.query.filter_by(eventId=int(id)).delete()
+    db.session.commit()
+    status = 'Event Deleted'
+    return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
+
 
 
 if __name__ == '__main__':
