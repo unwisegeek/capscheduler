@@ -74,6 +74,23 @@ def schedule_window():
         pageAction = request.values.get('pageAction')
     else:
         pageAction = ''
+
+    # Grab variables for 'edit' pageAction
+    eventData = []
+    if pageAction == 'EditEvent':
+        id = request.values.get('eventId')
+        eventobj = Event.query.filter_by(eventId=int(id))
+        eventData += [ eventobj[0].eventId ]
+        eventData += [ eventobj[0].eventDate ]
+        eventData += [ eventobj[0].startTime ]
+        eventData += [ eventobj[0].stopTime ]
+        eventData += [ eventobj[0].eventName ]
+        eventData += [ eventobj[0].eventLdr ]
+        eventData += [ eventobj[0].isAgreedTo ]
+        eventData += [ eventobj[0].isEmailScheduled ]
+        eventData += [ eventobj[0].isEmailSent ]
+        eventData += [ eventobj[0].isEmailConfirmed ]
+
     if 'meetingDate' in request.values:
         meetingDate = request.values.get('meetingDate')
         # Account for meetingDate coming back in a different format
@@ -98,7 +115,7 @@ def schedule_window():
                                                              queryResults[i].isEmailConfirmed)
                 sortedQueryResults += [ row.split('|') ]
         return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus,
-                                pageAction=pageAction)
+                                pageAction=pageAction, eventData=eventData)
     else:
         # Redirect if the date has not been set.
         return redirect('/')
@@ -134,7 +151,7 @@ def newevent():
         newevent = ''
         # Redirect
         return redirect('/schedule?meetingDate={}&status=Event%20Added'.format(meetingDate))
-    return redirect('/schedule?meetingDate={}&status=Error%20Adding%20Event.format(')
+    return redirect('/schedule?meetingDate={}&status=Error%20Adding%20Event'.format(meetingDate))
 
 @app.route('/delete', methods=['GET', 'POST'])
 def deleteevent():
@@ -144,8 +161,6 @@ def deleteevent():
     db.session.commit()
     status = 'Event Deleted'
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
-
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

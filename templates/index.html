@@ -47,7 +47,7 @@
         <td>{{ elem }}</td>
         {% endfor %}
         <td>
-            <form action="/edit?meetingDate={{ meetingDate }}&eventId={{ result[0] }}" method="post">
+            <form action="/schedule?meetingDate={{ meetingDate }}&eventId={{ result[0] }}&pageAction=EditEvent" method="post">
                 <input type="hidden" name="meetingDate" id="meetingDate" value="{{ meetingDate }}">
                 <input type="hidden" name="eventId" id="eventId" value="{{ result[0] }}">
                 <button type="submit">Edit</button>
@@ -137,33 +137,33 @@
     </tr>
     <form action="/newevent?meetingDate={{ meetingDate }}">
     <tr>
-        <td><input type="date" id="eventDate" name="eventDate" value="{{ meetingDate }}"></td>
-        <td><input type="text" id="startTime" name="startTime" value="{{ startTime }}"></td>
-        <td><input type="text" id="stopTime" name="stopTime" value="{{ stopTime }}"></td>
-        <td><input type="text" id="eventName" name="eventName" value="{{ eventName }}"></td>
-        <td><input type="text" id="eventLdr" name="eventLdr" value="{{ eventLdr }}"></td>
+        <td><input type="date" id="eventDate" name="eventDate" value="{{ eventData[1] }}"></td>
+        <td><input type="text" id="startTime" name="startTime" value="{{ eventData[2] }}"></td>
+        <td><input type="text" id="stopTime" name="stopTime" value="{{ eventData[3] }}"></td>
+        <td><input type="text" id="eventName" name="eventName" value="{{ eventData[4] }}"></td>
+        <td><input type="text" id="eventLdr" name="eventLdr" value="{{ eventData[5] }}"></td>
         <td>
-            <input type="radio" id="false" name="isAgreedTo" value="0" {% if 'isAgreedTo' == 0 %}checked{% endif %}>
+            <input type="radio" id="false" name="isAgreedTo" value="0" {% if eventData[6] == 0 %}checked{% endif %}>
             <label for="false">False</label><br>
-            <input type="radio" id="true" name="isAgreedTo" value="1" {% if 'isAgreedTo' == 1 %}checked{% endif %}>
+            <input type="radio" id="true" name="isAgreedTo" value="1" {% if eventData[6] == 1 %}checked{% endif %}>
             <label for="true">True</label>
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailScheduled" value="0">
+            <input type="radio" id="false" name="isEmailScheduled" value="0" {% if eventData[7] == 0 %}checked{% endif %}>
             <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailScheduled" value="1">
+            <input type="radio" id="true" name="isEmailScheduled" value="1" {% if eventData[7] == 1 %}checked{% endif %}>
             <label for="true">True</label>
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailSent" value="0">
+            <input type="radio" id="false" name="isEmailSent" value="0" {% if eventData[8] == 0 %}checked{% endif %}>
             <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailSent" value="1">
+            <input type="radio" id="true" name="isEmailSent" value="1" {% if eventData[8] == 1 %}checked{% endif %}>
             <label for="true">True</label>
         </td>
         <td>
-            <input type="radio" id="false" name="isEmailConfirmed" value="0">
+            <input type="radio" id="false" name="isEmailConfirmed" value="0" {% if eventData[9] == 0 %}checked{% endif %}>
             <label for="false">False</label><br>
-            <input type="radio" id="true" name="isEmailConfirmed" value="1">
+            <input type="radio" id="true" name="isEmailConfirmed" value="1" {% if eventData[9] == 1 %}checked{% endif %}>
             <label for="true">True</label>
         </td>
         <td>
@@ -171,7 +171,7 @@
             <input type="hidden" id="meetingDate" name="meetingDate" value="{{ meetingDate }}">
             <input type="reset" value="Clear">
             <!-- <input type="submit" value="Add Event"> -->
-            <button type="submit" formmethod="post" onclick="return confirm('Are you sure you want to add this event?'>Add Event</button>
+            <button type="submit" formmethod="post" onclick="return confirm('Are you sure you want to add this event?')">Add Event</button>
         </td>
     </tr>
 </form>
