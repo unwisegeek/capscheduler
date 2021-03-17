@@ -162,5 +162,25 @@ def deleteevent():
     status = 'Event Deleted'
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
 
+@app.route('/edit', methods=['POST'])
+def editevent():
+    meetingDate = request.values.get('meetingDate')
+    id = request.values.get('eventId')
+    status = "Event Updated"
+    event = Event.query.filter_by(eventId=int(id)).first()
+    event.eventDate = request.values.get('eventDate')
+    event.startTime = request.values.get('startTime')
+    event.stopTime = request.values.get('stopTime')
+    event.eventName = request.values.get('eventName')
+    event.eventLdr = request.values.get('eventLdr')
+    event.isAgreedTo = request.values.get('isAgreedTo')
+    event.isEmailScheduled = request.values.get('isEmailScheduled')
+    event.isEmailSent = request.values.get('isEmailSent')
+    event.isEmailConfirmed = request.values.get('isEmailConfirmed')
+    event.isEmailDeleted = request.values.get('isDeleted')
+    db.session.commit()
+    return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
