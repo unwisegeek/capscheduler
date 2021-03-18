@@ -21,16 +21,20 @@ CONTACT_ACCOUNTS = [
     'None',
     'Aerospace',
     'Character Development',
+    'Emergency Services',
     'Leadership',
-    'Physical Training'
+    'Physical Training',
+    'Safety'
 ]
 
 CONTACT_ABRVS = {
     'None': 'NA',
     'Aerospace': 'AE',
     'Character Development': 'CD',
+    'Emergency Services': 'ES',
     'Leadership': 'LD',
-    'Physical Training': 'PT'
+    'Physical Training': 'PT',
+    'Safety': 'SF'
 }
 
 DATEFMT = '%Y-%m-%d'
