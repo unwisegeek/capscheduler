@@ -17,6 +17,22 @@ DAYNUM = { 'Monday': 0,
                'Sunday': 6,
 }
 
+CONTACT_ACCOUNTS = [
+    'None',
+    'Aerospace',
+    'Character Development',
+    'Leadership',
+    'Physical Training'
+]
+
+CONTACT_ABRVS = {
+    'None': 'NA',
+    'Aerospace': 'AE',
+    'Character Development': 'CD',
+    'Leadership': 'LD',
+    'Physical Training': 'PT'
+}
+
 DATEFMT = '%Y-%m-%d'
 meetingDay = 'Thursday'
 
@@ -36,6 +52,11 @@ def convert_bool_to_ballot(targValue):
     else:
         return "&#9745"
 
+def convert_times_to_minutes(stopTime, startTime, format="%H:%M"):
+    difference = (datetime.strptime(stopTime, format) - datetime.strptime(startTime, format))
+    minutes = difference.total_seconds() // 60
+    return int(minutes)
+
 # Create the event model for the database.
 class Event(db.Model):
     __tablename__ = 'events'
@@ -46,6 +67,8 @@ class Event(db.Model):
     stopTime = db.Column(db.String(5), unique=False, nullable=False)
     eventName = db.Column(db.String(80), unique=False, nullable=False)
     eventLdr = db.Column(db.String(80), unique=False, nullable=False)
+    contactAccount = db.Column(db.String(20), unique=False, nullable=False)
+    contactMinutes = db.Column(db.Integer, unique=False, nullable=False)
     isAgreedTo = db.Column(db.Integer, unique=False, nullable=False)
     isEmailScheduled = db.Column(db.Integer, unique=False, nullable=False)
     isEmailSent = db.Column(db.Integer, unique=False, nullable=False)
@@ -92,6 +115,7 @@ def schedule_window():
         eventData += [ eventobj[0].stopTime ]
         eventData += [ eventobj[0].eventName ]
         eventData += [ eventobj[0].eventLdr ]
+        eventData += [ eventobj[0].contactAccount ]
         eventData += [ eventobj[0].isAgreedTo ]
         eventData += [ eventobj[0].isEmailScheduled ]
         eventData += [ eventobj[0].isEmailSent ]
@@ -115,13 +139,13 @@ def schedule_window():
         counter = result_length(queryResults)
         for i in range(0, counter):
             if queryResults[i].isDeleted != 1:
-                row = '{}|{}|{}|{}|{}|{}|{}|{}|{}|{}'.format(queryResults[i].eventId, queryResults[i].eventDate, queryResults[i].startTime, \
+                row = '{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}'.format(queryResults[i].eventId, queryResults[i].eventDate, queryResults[i].startTime, \
                                                              queryResults[i].stopTime, queryResults[i].eventName, queryResults[i].eventLdr, \
-                                                             queryResults[i].isAgreedTo, queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, \
-                                                             queryResults[i].isEmailConfirmed)
+                                                             CONTACT_ABRVS[queryResults[i].contactAccount], queryResults[i].isAgreedTo, \
+                                                             queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, queryResults[i].isEmailConfirmed)
                 sortedQueryResults += [ row.split('|') ]
         return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus,
-                                pageAction=pageAction, eventData=eventData)
+                                pageAction=pageAction, eventData=eventData, accounts=CONTACT_ACCOUNTS)
     else:
         # Redirect if the date has not been set.
         return redirect('/')
@@ -137,23 +161,26 @@ def newevent():
     # Check that all required variables that are needed to create an event in the database are there.
     reqVarsExist = True
     meetingDate = request.values.get('meetingDate')
-    for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr' ]:
+    for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr', 'contactAccount' ]:
         if each not in request.values:
             reqVarsExist = False
     if reqVarsExist:
         # Create list of variable values.
         data = []
-        for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr' ]:
+        for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr', 'contactAccount' ]:
             data += [ request.values.get(each) ]
             
 
         for each in [ 'isAgreedTo', 'isEmailScheduled', 'isEmailSent', 'isEmailConfirmed' ]:
             data += [ isin(each) ]
 
+        # Calculate contact minutes for new events.
+        data += [ convert_times_to_minutes(data[2], data[1]) ]
+
         # Create a new DB entry.
         newevent = Event(eventDate=data[0], startTime=data[1], stopTime=data[2], eventName=data[3], eventLdr=data[4], \
-                         isAgreedTo=data[5], isEmailScheduled=data[6], isEmailSent=data[7], isEmailConfirmed=data[8], \
-                         isDeleted=0)
+                         contactAccount=data[5], contactMinutes=data[6], isAgreedTo=data[6], isEmailScheduled=data[7], \
+                         isEmailSent=data[8], isEmailConfirmed=data[9], isDeleted=0)
         # Commit the DB entry and send them back to the index page with the previous date.
         db.session.add(newevent)
         db.session.commit()
@@ -188,6 +215,11 @@ def editevent():
     event.stopTime = request.values.get('stopTime')
     event.eventName = request.values.get('eventName')
     event.eventLdr = request.values.get('eventLdr')
+    event.contactAccount = request.values.get('contactAccount')
+
+    # Calculate new contact hours.
+
+    event.contactMinutes = convert_times_to_minutes(request.values.get('stopTime'), request.values.get('startTime'))
 
     event.isAgreedTo = isin('isAgreedTo')
     event.isEmailScheduled = isin('isEmailScheduled')

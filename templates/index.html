@@ -34,6 +34,7 @@
         <th>Stop</th>
         <th>Event Name</th>
         <th>Leader</th>
+        <th>Hours</th>
         <th>Agreed To</th>
         <th>Conf. Scheduled</th>
         <th>Conf. Sent</th>
@@ -81,6 +82,7 @@
         <th>Stop Time</th>
         <th>Event Name</th>
         <th>Event Leader</th>
+        <th>Hour Type</th>
         <th>Event Agreed To</th>
         <th>Conf. Email Scheduled</th>
         <th>Conf. Email Sent</th>
@@ -93,6 +95,13 @@
         <td><input type="text" id="stopTime" name="stopTime" value="18:00"></td>
         <td><input type="text" id="eventName" name="eventName" value=""></td>
         <td><input type="text" id="eventLdr" name="eventLdr" value=""></td>
+        <td>
+            <select id="contactAccount" name="contactAccount">
+                {% for account in accounts %}
+                    <option value="{{ account }}">{{ account }}</option>
+                {% endfor %}
+            </select>
+        </td>
         <td>
             <input type="checkbox" id="isAgreedTo" name="isAgreedTo" value="1">
         </td>
@@ -127,6 +136,7 @@
         <th>Stop Time</th>
         <th>Event Name</th>
         <th>Event Leader</th>
+        <th>Hour Type</th>
         <th>Event Agreed To</th>
         <th>Conf. Email Scheduled</th>
         <th>Conf. Email Sent</th>
@@ -139,17 +149,26 @@
         <td><input type="text" id="stopTime" name="stopTime" value="{{ eventData[3] }}"></td>
         <td><input type="text" id="eventName" name="eventName" value="{{ eventData[4] }}"></td>
         <td><input type="text" id="eventLdr" name="eventLdr" value="{{ eventData[5] }}"></td>
+
         <td>
-            <input type="checkbox" id="isAgreedTo" name="isAgreedTo" value="1" {% if eventData[6] == 1 %}checked{% endif %}>
+            <select id="contactAccount" name="contactAccount">
+                {% for account in accounts %}
+                    <option value="{{ account }}" {% if eventData [6] == account %}selected{% endif %}>{{ account }}</option>
+                {% endfor %}
+            </select>
+        </td>
+
+        <td>
+            <input type="checkbox" id="isAgreedTo" name="isAgreedTo" value="1" {% if eventData[7] == 1 %}checked{% endif %}>
         </td>
         <td>
-            <input type="checkbox" id="isEmailScheduled" name="isEmailScheduled" value="1" {% if eventData[7] == 1 %}checked{% endif %}>
+            <input type="checkbox" id="isEmailScheduled" name="isEmailScheduled" value="1" {% if eventData[8] == 1 %}checked{% endif %}>
         </td>
         <td>
-            <input type="checkbox" id="isEmailSent" name="isEmailSent" value="1" {% if eventData[8] == 1 %}checked{% endif %}>
+            <input type="checkbox" id="isEmailSent" name="isEmailSent" value="1" {% if eventData[9] == 1 %}checked{% endif %}>
         </td>
         <td>
-            <input type="checkbox" id="isEmailConfirmed" name="isEmailConfirmed" value="1" {% if eventData[9] == 1 %}checked{% endif %}>
+            <input type="checkbox" id="isEmailConfirmed" name="isEmailConfirmed" value="1" {% if eventData[10] == 1 %}checked{% endif %}>
         </td>
         <td>
             <input type="hidden" id="eventId" name="eventId" value="{{ eventData[0] }}">
