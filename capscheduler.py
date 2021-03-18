@@ -4,7 +4,7 @@ from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/capscheduler.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
