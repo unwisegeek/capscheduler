@@ -140,16 +140,25 @@ def schedule_window():
         # Get results from DB
         queryResults = Event.query.filter_by(eventDate=meetingDate)
         sortedQueryResults = []
+        minutes = {}
+        # Populate minutes
+        for account in CONTACT_ACCOUNTS:
+            minutes[CONTACT_ABRVS[account]] = 0
         counter = result_length(queryResults)
+
         for i in range(0, counter):
             if queryResults[i].isDeleted != 1:
+                minutes[CONTACT_ABRVS[queryResults[i].contactAccount]] += queryResults[i].contactMinutes
                 row = '{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}'.format(queryResults[i].eventId, queryResults[i].eventDate, queryResults[i].startTime, \
                                                              queryResults[i].stopTime, queryResults[i].eventName, queryResults[i].eventLdr, \
                                                              CONTACT_ABRVS[queryResults[i].contactAccount], queryResults[i].isAgreedTo, \
                                                              queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, queryResults[i].isEmailConfirmed)
                 sortedQueryResults += [ row.split('|') ]
+        # Convern minute and abrvs dictionaries to lists before sending them:
+        minute_list = list(minutes.values())
+        abrvs_list = list(CONTACT_ABRVS.values())
         return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus,
-                                pageAction=pageAction, eventData=eventData, accounts=CONTACT_ACCOUNTS)
+                                pageAction=pageAction, eventData=eventData, accounts=CONTACT_ACCOUNTS, minutes=minute_list, abrvs=abrvs_list)
     else:
         # Redirect if the date has not been set.
         return redirect('/')
@@ -174,12 +183,11 @@ def newevent():
         for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr', 'contactAccount' ]:
             data += [ request.values.get(each) ]
             
+        # Calculate contact minutes for new events.
+        data += [ convert_times_to_minutes(data[2], data[1]) ]
 
         for each in [ 'isAgreedTo', 'isEmailScheduled', 'isEmailSent', 'isEmailConfirmed' ]:
             data += [ isin(each) ]
-
-        # Calculate contact minutes for new events.
-        data += [ convert_times_to_minutes(data[2], data[1]) ]
 
         # Create a new DB entry.
         newevent = Event(eventDate=data[0], startTime=data[1], stopTime=data[2], eventName=data[3], eventLdr=data[4], \

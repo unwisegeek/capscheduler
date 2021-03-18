@@ -26,6 +26,7 @@
 </table>
 </div>
 <hr>
+<h1 style="text-align: center">Schedule</h1>
 <table style="margin: 0 auto; width: 100%; text-align: center;">
     <tr>
         <th>ID</th>
@@ -72,6 +73,20 @@
     </tr>
 </table>
 <p style="text-align: center;"><a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a></p>
+<hr>
+<h1 style="text-align: center;">Contact Hours</h1>
+<table style="margin: 0 auto; width: 30%; text-align: center;">
+    <tr>
+    {% for abrv in abrvs %}
+        <th>{{ abrv }}</th>
+    {% endfor %}
+</tr>
+<tr>
+    {% for min in minutes %}
+        <td>{{ min }}</td>
+    {% endfor %}
+</tr>
+</table>
 {% if pageAction == 'AddEvent' %}
 <hr>
 <h1 style="text-align: center;">New Event</h1>
@@ -183,5 +198,7 @@
 </table>
 <hr>
 {% endif %}
+{% if status != '' %}
 <p style="text-align: center; color: red">{{ status }}</p>
+{% endif %}
 {% endblock %}
