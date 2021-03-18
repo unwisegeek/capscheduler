@@ -128,45 +128,32 @@ def schedule_window():
 
 @app.route('/newevent', methods=['GET', 'POST'])
 def newevent():
+    def isin(flag):
+        if flag in request.values:
+            return  1
+        else:
+            return 0
+    
     # Check that all required variables that are needed to create an event in the database are there.
     reqVarsExist = True
     meetingDate = request.values.get('meetingDate')
-    for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr', 'isDeleted' ]:
+    for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr' ]:
         if each not in request.values:
             reqVarsExist = False
     if reqVarsExist:
         # Create list of variable values.
         data = []
-        data += [ request.values.get('eventDate') ]
-        data += [ request.values.get('startTime') ]
-        data += [ request.values.get('stopTime') ]
-        data += [ request.values.get('eventName') ]
-        data += [ request.values.get('eventLdr') ]
+        for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr' ]:
+            data += [ request.values.get(each) ]
+            
 
-        if 'isAgreedTo' in request.values:
-            data += [ 1 ]
-        else:
-            data += [ 0 ]
-        
-        if 'isEmailScheduled' in request.values:
-            data += [ 1 ]
-        else:
-            data += [ 0 ]
-
-        if 'isEmailSent' in request.values:
-            data += [ 1 ]
-        else:
-            data += [ 0 ]
-        
-        if 'isEmailConfirmed' in request.values:
-            data += [ 1 ]
-        else:
-            data += [ 0 ]
+        for each in [ 'isAgreedTo', 'isEmailScheduled', 'isEmailSent', 'isEmailConfirmed' ]:
+            data += [ isin(each) ]
 
         # Create a new DB entry.
         newevent = Event(eventDate=data[0], startTime=data[1], stopTime=data[2], eventName=data[3], eventLdr=data[4], \
                          isAgreedTo=data[5], isEmailScheduled=data[6], isEmailSent=data[7], isEmailConfirmed=data[8], \
-                         isDeleted=9)
+                         isDeleted=0)
         # Commit the DB entry and send them back to the index page with the previous date.
         db.session.add(newevent)
         db.session.commit()
