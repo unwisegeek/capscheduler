@@ -191,8 +191,8 @@ def newevent():
 
         # Create a new DB entry.
         newevent = Event(eventDate=data[0], startTime=data[1], stopTime=data[2], eventName=data[3], eventLdr=data[4], \
-                         contactAccount=data[5], contactMinutes=data[6], isAgreedTo=data[6], isEmailScheduled=data[7], \
-                         isEmailSent=data[8], isEmailConfirmed=data[9], isDeleted=0)
+                         contactAccount=data[5], contactMinutes=data[6], isAgreedTo=data[7], isEmailScheduled=data[8], \
+                         isEmailSent=data[9], isEmailConfirmed=data[10], isDeleted=0)
         # Commit the DB entry and send them back to the index page with the previous date.
         db.session.add(newevent)
         db.session.commit()
