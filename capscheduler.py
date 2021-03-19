@@ -99,7 +99,7 @@ class MonthlyStats(db.Model):
     
 
 # Initialize the database file if one does not exist.
-if not os.path.exists('capscheduler.db'):
+if not os.path.exists('db/capscheduler.db'):
     print('Creating database.')
     db.create_all()
     
@@ -259,6 +259,10 @@ def editevent():
     event.isEmailDeleted = isin('isDeleted')
     db.session.commit()
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
+
+@app.route('/updatestats', methods=['GET'])
+def updatestats():
+
 
 
 if __name__ == '__main__':
