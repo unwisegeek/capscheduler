@@ -2,11 +2,19 @@ import os
 from flask import Flask, render_template, request, redirect
 from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
+from flask_script import Server, Manager
+from flask_migrate import Migrate, MigrateCommand
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/capscheduler.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+migrate = Migrate(app, db)
+manager = Manager(app)
+
+manager.add_command('db', MigrateCommand)
+manager.add_command('runserver', Server(host='0.0.0.0', port=5000))
 
 DAYNUM = { 'Monday': 0,
                'Tuesday': 1,
@@ -78,6 +86,17 @@ class Event(db.Model):
     isEmailSent = db.Column(db.Integer, unique=False, nullable=False)
     isEmailConfirmed = db.Column(db.Integer, unique=False, nullable=False)
     isDeleted = db.Column(db.Integer, unique=False, nullable=False)
+
+class MonthlyStats(db.Model):
+    __tablename__ = 'monthly-statistics'
+    __table_args__ = { 'sqlite_autoincrement': True }
+    statsId = db.Column(db.Integer, primary_key=True)
+    statsYear = db.Column(db.Integer, unique=False, nullable=False)
+    statsMonth = db.Column(db.Integer, unique=False, nullable=False)
+    contactAccount = db.Column(db.String(30), unique=False, nullable=False)
+    contactMinutes = db.Column(db.Integer, unique=False, nullable=False)
+    
+    
 
 # Initialize the database file if one does not exist.
 if not os.path.exists('capscheduler.db'):
@@ -243,4 +262,6 @@ def editevent():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    #app.run(debug=True, host='0.0.0.0')
+    manager.run()
+
