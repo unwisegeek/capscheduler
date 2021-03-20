@@ -14,7 +14,7 @@ migrate = Migrate(app, db)
 manager = Manager(app)
 
 manager.add_command('db', MigrateCommand)
-manager.add_command('runserver', Server(host='0.0.0.0', port=5000))
+manager.add_command('runserver', Server(host='0.0.0.0', port=5000,use_debugger=True,use_reloader=True))
 
 DAYNUM = { 'Monday': 0,
                'Tuesday': 1,
@@ -69,6 +69,36 @@ def convert_times_to_minutes(stopTime, startTime, format="%H:%M"):
     minutes = difference.total_seconds() // 60
     return int(minutes)
 
+def count_stats(year, month, acct, mins):
+    """
+    Adds contact hours to stats db
+    
+    Requires: year, month, acct, mins
+    """
+    try:
+        statsobj = MonthlyStats.query.filter_by(statsYear=int(year)).filter_by(statsMonth=int(month)).filter_by(contactAccount=acct)
+        statsobj[0].contactMinutes = statsobj[0].contactMinutes + mins
+    except:
+        newstat = MonthlyStats(statsYear=int(year),statsMonth=int(month),contactAccount=acct,contactMinutes=int(mins))
+        db.session.add(newstat)
+    db.session.commit()
+    return
+    
+def uncount_stats(year, month, acct, mins):
+    """
+    Removes contact hours from stats db
+    
+    Requires: year, month, acct, mins
+    """
+    try:
+        statsobj = MonthlyStats.query.filter_by(statsYear=int(year)).filter_by(statsMonth=int(month)).filter_by(contactAccount=acct)
+        statsobj[0].contactMinutes = statsobj[0].contactMinutes - mins
+        db.session.commit()
+    except:
+        pass
+    return
+
+
 # Create the event model for the database.
 class Event(db.Model):
     __tablename__ = 'events'
@@ -86,6 +116,7 @@ class Event(db.Model):
     isEmailSent = db.Column(db.Integer, unique=False, nullable=False)
     isEmailConfirmed = db.Column(db.Integer, unique=False, nullable=False)
     isDeleted = db.Column(db.Integer, unique=False, nullable=False)
+    isStated = db.Column(db.Integer, unique=False, nullable=False, default=0)
 
 class MonthlyStats(db.Model):
     __tablename__ = 'monthly-statistics'
@@ -216,6 +247,9 @@ def newevent():
         db.session.add(newevent)
         db.session.commit()
         newevent = ''
+        # Add to statistics DB
+        date = data[0].split('-')
+        count_stats(date[0], date[1], data[5], data[6])
         # Redirect
         return redirect('/schedule?meetingDate={}&status=Event%20Added'.format(meetingDate))
     return redirect('/schedule?meetingDate={}&status=Error%20Adding%20Event'.format(meetingDate))
@@ -226,6 +260,8 @@ def deleteevent():
     id = request.values.get('eventId')
     eventobj = Event.query.filter_by(eventId=int(id)).first()
     eventobj.isDeleted = 1
+    date = eventobj.eventDate.split('-')
+    uncount_stats(date[0], date[1], eventobj.contactAccount, eventobj.contactMinutes)
     db.session.commit()
     status = 'Event Deleted'
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
@@ -260,10 +296,20 @@ def editevent():
     db.session.commit()
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
 
-@app.route('/updatestats', methods=['GET'])
-def updatestats():
-
-
+@app.route('/recalculatestats', methods=['GET', 'POST'])
+def recalcstats():
+    meetingDate = request.values.get('meetingDate')
+    eventQuery = Event.query
+    statsobj = MonthlyStats.query.delete()
+  
+    for i in range(0, result_length(eventQuery)):
+        if eventQuery[i].isDeleted != 1:
+            date = eventQuery[i].eventDate.split('-')
+            count_stats(date[0], date[1], eventQuery[i].contactAccount, eventQuery[i].contactMinutes) # year, month, acct, mins
+            eventQuery[i].isStated = 1
+            db.session.commit()
+    return redirect('/schedule?meetingDate={}'.format(meetingDate))
+    
 
 if __name__ == '__main__':
     #app.run(debug=True, host='0.0.0.0')
