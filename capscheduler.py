@@ -65,7 +65,7 @@ def convert_bool_to_ballot(targValue):
         return "&#9745"
 
 def convert_times_to_minutes(stopTime, startTime, format="%H:%M"):
-    difference = (datetime.strpti   me(stopTime, format) - datetime.strptime(startTime, format))
+    difference = (datetime.strptime(stopTime, format) - datetime.strptime(startTime, format))
     minutes = difference.total_seconds() // 60
     return int(minutes)
 
