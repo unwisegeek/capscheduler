@@ -1,33 +1,26 @@
 {% extends 'base.html' %}
 
-{% block style %}
-.dateNav {
-    display: table;
-    margin: 0 auto;
-}
+{% block head %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAP Scheduler</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 {% endblock %}
 
 {% block body %}
-<div class="dateNav">
-<table>
-    <tr>
-        <td><button onclick="window.location.href='/schedule?meetingDate={{ prevDate }}'"><<</button></td>
-        <td><form style="display: table;" action="/schedule">
-            <input type="date" id="meetingDate" name="meetingDate" value="{{ meetingDate }}">
+<div class="topnav">
+    <a href="/schedule?meetingDate={{ prevDate }}"><< {{ prevDate }}</a>
+    <a href="/schedule?meetingDate={{ nextDate }}">{{ nextDate }} >></a>
+    <form action="/schedule">
+            <input type="date" id="meetingDate" name="meetingDate" value="{{ meetingDate }}" data-date-inline-picker="true">
             <input type="submit" value="Submit">
-            </form>
-        </td>
-        <td><button onclick="window.location.href='/schedule?meetingDate={{ nextDate }}'">>></button></td>
-    </tr>
-    <tr>
-        <td>
-        </td>
-    </tr>
-</table>
+    </form>
+    <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a>
 </div>
-<hr>
-<h1 style="text-align: center">Schedule</h1>
-<table style="margin: 0 auto; width: 100%; text-align: center;">
+
+<div class="content">
+    <h1 style="width: 80%; float: left;">Schedule</h1><h1 style="width: 20%; float: right;">Contact Hours</h1>
+    <table id="left-table">
     <tr>
         <th>ID</th>
         <th>Event</th>
@@ -58,39 +51,30 @@
         </td>
         {% endfor %}
         <td>
-            <form action="/schedule?meetingDate={{ meetingDate }}&eventId={{ result[0] }}&pageAction=EditEvent" method="post">
-                <input type="hidden" name="meetingDate" id="meetingDate" value="{{ meetingDate }}">
-                <input type="hidden" name="eventId" id="eventId" value="{{ result[0] }}">
-                <button type="submit">Edit</button>
-            </form>
-            <form action="/delete?meetingDate={{ meetingDate }}&eventId={{ result[0] }}" method="post">
-                <input type="hidden" name="meetingDate" id="meetingDate" value="{{ meetingDate }}">
-                <input type="hidden" name="eventId" id="eventId" value="{{ result[0] }}">
-                <button type="submit" onclick="return confirm('Are you sure you want to delete this event?')">Delete</button>
-            </form>
+            <a href="/schedule?meetingDate={{ meetingDate }}&eventId={{ result[0] }}&pageAction=EditEvent">Edit</a>
+            <a href="/delete?meetingDate={{ meetingDate }}&eventId={{ result[0] }}">Delete</a>
+        </td>
     </tr>
     {% endfor %}
     </tr>
-</table>
-<p style="text-align: center;"><a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a></p>
-<hr>
-<h1 style="text-align: center;">Contact Hours</h1>
-<table style="margin: 0 auto; width: 30%; text-align: center;">
+    </table>
+    
+    <table id="right-table">
+        <tr>
+        {% for abrv in abrvs %}
+            <th>{{ abrv }}</th>
+        {% endfor %}
+    </tr>
     <tr>
-    {% for abrv in abrvs %}
-        <th>{{ abrv }}</th>
-    {% endfor %}
-</tr>
-<tr>
-    {% for min in minutes %}
-        <td>{{ min }}</td>
-    {% endfor %}
-</tr>
-</table>
+        {% for min in minutes %}
+            <td>{{ min }}</td>
+        {% endfor %}
+    </tr>
+    </table>
 {% if pageAction == 'AddEvent' %}
 <hr>
-<h1 style="text-align: center;">New Event</h1>
-<table style="margin: 0 auto; width: 100%; text-align: center;">
+<h1>New Event</h1>
+<table>
     <tr>
         <th>Event Date</th>
         <th>Start Time</th>
@@ -143,8 +127,8 @@
 {% endif %}
 {% if pageAction == 'EditEvent' %}
 <hr>
-<h1 style="text-align: center;">Edit Event</h1>
-<table style="margin: 0 auto; width: 100%; text-align: center;">
+<h1>Edit Event</h1>
+<table>
     <tr>
         <th>Event Date</th>
         <th>Start Time</th>
@@ -198,7 +182,9 @@
 </table>
 <hr>
 {% endif %}
+</div>
 {% if status != '' %}
-<p style="text-align: center; color: red">{{ status }}</p>
+<p style="text-align: center; text-color: red;">{{ status }}</p>
 {% endif %}
+</div>
 {% endblock %}

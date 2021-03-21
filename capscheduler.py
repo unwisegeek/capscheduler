@@ -6,7 +6,7 @@ from flask_script import Server, Manager
 from flask_migrate import Migrate, MigrateCommand
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/capscheduler.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -65,7 +65,7 @@ def convert_bool_to_ballot(targValue):
         return "&#9745"
 
 def convert_times_to_minutes(stopTime, startTime, format="%H:%M"):
-    difference = (datetime.strptime(stopTime, format) - datetime.strptime(startTime, format))
+    difference = (datetime.strpti   me(stopTime, format) - datetime.strptime(startTime, format))
     minutes = difference.total_seconds() // 60
     return int(minutes)
 
