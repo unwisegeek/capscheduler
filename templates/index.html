@@ -16,6 +16,7 @@
             <input type="submit" value="Submit">
     </form>
     <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a>
+    <a href="">Status: {{ status }}</a>
 </div>
 
 <div class="content">
@@ -183,8 +184,5 @@
 <hr>
 {% endif %}
 </div>
-{% if status != '' %}
-<p style="text-align: center; text-color: red;">{{ status }}</p>
-{% endif %}
 </div>
 {% endblock %}
