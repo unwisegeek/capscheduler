@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, sessions
 from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Server, Manager
@@ -9,6 +9,13 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Check for secret_key file.
+if not os.path.exists('./.secret_key'):
+    raise Exception('Please generate a secret key.\r\nEx: dd if=/dev/random bs=100M count=1 | sha256sum | cut -d ' ' -f1 > .secret_key')
+else:
+    app.secret_key = open('./.secret_key', 'r').read().encode('utf8')
+
 
 migrate = Migrate(app, db)
 manager = Manager(app)
