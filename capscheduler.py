@@ -137,7 +137,7 @@ class MonthlyStats(db.Model):
     
 
 # Initialize the database file if one does not exist.
-if not os.path.exists('db/capscheduler.db'):
+if not os.path.exists('./capscheduler.db'):
     print('Creating database.')
     db.create_all()
     
