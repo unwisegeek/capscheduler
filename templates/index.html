@@ -16,7 +16,9 @@
             <input type="submit" value="Submit">
     </form>
     <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a>
+    {% if status != '' %}
     <a href="">Status: {{ status }}</a>
+    {% endif %}
 </div>
 
 <div class="content">
