@@ -16,6 +16,7 @@
             <input type="submit" value="Submit">
     </form>
     <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a>
+    <a href="/recalculatestats?meetingDate={{ meetingDate}}">Recalculate Stats</a>
     {% if status != '' %}
     <a href="">Status: {{ status }}</a>
     {% endif %}
@@ -64,6 +65,18 @@
     
     <table id="right-table">
         <tr>
+            <th></th>
+            <th>D</th>
+            <th>M</th>
+        </tr>
+        {% for i in range(0, abrvs | length) %}
+            <tr>
+                <td><b>{{ abrvs[i] }}</b></td>
+                <td>{{ minutes[i] }}</td>
+                <td>{{ mminutes[i] }}</td>
+            </tr>
+        {% endfor %}
+        <!-- <tr>
         {% for abrv in abrvs %}
             <th>{{ abrv }}</th>
         {% endfor %}
@@ -72,7 +85,7 @@
         {% for min in minutes %}
             <td>{{ min }}</td>
         {% endfor %}
-    </tr>
+    </tr> -->
     </table>
 {% if pageAction == 'AddEvent' %}
 <hr>
@@ -93,8 +106,8 @@
     <form action="/newevent?meetingDate={{ meetingDate }}">
     <tr>
         <td><input type="date" id="eventDate" name="eventDate" value="{{ meetingDate }}"></td>
-        <td><input type="text" id="startTime" name="startTime" value="17:00"></td>
-        <td><input type="text" id="stopTime" name="stopTime" value="18:00"></td>
+        <td><input type="text" id="startTime" name="startTime" value=""></td>
+        <td><input type="text" id="stopTime" name="stopTime" value=""></td>
         <td><input type="text" id="eventName" name="eventName" value=""></td>
         <td><input type="text" id="eventLdr" name="eventLdr" value=""></td>
         <td>

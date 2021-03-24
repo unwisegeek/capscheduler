@@ -5,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Server, Manager
 from flask_migrate import Migrate, MigrateCommand
 
+from config import *
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -22,38 +24,6 @@ manager = Manager(app)
 
 manager.add_command('db', MigrateCommand)
 manager.add_command('runserver', Server(host='0.0.0.0', port=5000,use_debugger=True,use_reloader=True))
-
-DAYNUM = { 'Monday': 0,
-               'Tuesday': 1,
-               'Wednesday': 2,
-               'Thursday': 3,
-               'Friday': 4,
-               'Saturday': 5,
-               'Sunday': 6,
-}
-
-CONTACT_ACCOUNTS = [
-    'None',
-    'Aerospace',
-    'Character Development',
-    'Emergency Services',
-    'Leadership',
-    'Physical Training',
-    'Safety'
-]
-
-CONTACT_ABRVS = {
-    'None': 'NA',
-    'Aerospace': 'AE',
-    'Character Development': 'CD',
-    'Emergency Services': 'ES',
-    'Leadership': 'LD',
-    'Physical Training': 'PT',
-    'Safety': 'SF'
-}
-
-DATEFMT = '%Y-%m-%d'
-meetingDay = 'Thursday'
 
 def result_length(set):
     counter = 0
@@ -189,20 +159,32 @@ def schedule_window():
             meetingDate = datetime.strptime(meetingDate, DATEFMT)
         else: # Year First
             meetingDate = datetime.strptime(meetingDate, '%Y-%m-%d')
+
         prevDate = meetingDate + timedelta(-7)
         prevDate = prevDate.strftime(DATEFMT)
         nextDate = meetingDate + timedelta(+7)
         nextDate = nextDate.strftime(DATEFMT)
         meetingDate = meetingDate.strftime('%Y-%m-%d')
+
         # Get results from DB
         queryResults = Event.query.filter_by(eventDate=meetingDate)
+        date = meetingDate.split('-')
         sortedQueryResults = []
         minutes = {}
-        # Populate minutes
+        monthly_minutes = []
+
+        # Populate minutes and monthly_minutes
         for account in CONTACT_ACCOUNTS:
             minutes[CONTACT_ABRVS[account]] = 0
+            queryStats = MonthlyStats.query.filter_by(statsYear=int(date[0])) \
+                                       .filter_by(statsMonth=int(date[1])) \
+                                       .filter_by(contactAccount=account)
+            try:
+                monthly_minutes += [ queryStats[0].contactMinutes ]
+            except:
+                monthly_minutes += [ 0 ]
+        
         counter = result_length(queryResults)
-
         for i in range(0, counter):
             if queryResults[i].isDeleted != 1:
                 minutes[CONTACT_ABRVS[queryResults[i].contactAccount]] += queryResults[i].contactMinutes
@@ -211,11 +193,13 @@ def schedule_window():
                                                              CONTACT_ABRVS[queryResults[i].contactAccount], queryResults[i].isAgreedTo, \
                                                              queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, queryResults[i].isEmailConfirmed)
                 sortedQueryResults += [ row.split('|') ]
-        # Convern minute and abrvs dictionaries to lists before sending them:
+        
+        # Convert minute and abrvs dictionaries to lists before sending them:
         minute_list = list(minutes.values())
         abrvs_list = list(CONTACT_ABRVS.values())
         return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus,
-                                pageAction=pageAction, eventData=eventData, accounts=CONTACT_ACCOUNTS, minutes=minute_list, abrvs=abrvs_list)
+                                pageAction=pageAction, eventData=eventData, accounts=CONTACT_ACCOUNTS, minutes=minute_list, 
+                                mminutes=monthly_minutes, abrvs=abrvs_list)
     else:
         # Redirect if the date has not been set.
         return redirect('/')
