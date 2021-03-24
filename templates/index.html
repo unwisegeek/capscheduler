@@ -77,10 +77,10 @@
         {% for elem in result %}
         {% if elem != result[0] and elem != result[1] %}
                 {% if elem == '0' %}
-                    <td id="email">&#9744</td>
+                    <td id="email" style="color: red;">&#9744</td>
                 {% else %}
                     {% if elem == '1' %}
-                    <td id="email">&#9745</td>
+                    <td id="email" style="color: green">&#9745</td>
                     {% else %}
                         <td id="detail">{{ elem }}</td>
                     {% endif %}
