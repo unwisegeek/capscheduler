@@ -54,12 +54,13 @@ body {
 }
 
 .content a:link, a:visited {
-    background-color: #333;
-    color: #f2f2f2;
-    padding: 14px 25px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
+  background-color: #333;
+  color: #f2f2f2;
+  padding: 14px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  box-sizing: border-box;
   }
 
 .content a:hover {
@@ -69,6 +70,7 @@ body {
     text-align: center;
     text-decoration: none;
     display: inline-block;
+    box-sizing: border-box;
   }
 
 .content #left-table {
@@ -97,6 +99,28 @@ body {
 
 .content #email {
   background-color: #cecdcd;
+}
+
+.content input[type=submit] {
+  width: auto;
+  background-color: #333;
+  color: #f2f2f2;
+  padding: 14px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.content input[type=submit]:hover {
+  width: auto;
+  background-color: #f2f2f2;
+  color: #333;
+  padding: 14px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  box-sizing: border-box;
 }
 
 /* Style the footer */

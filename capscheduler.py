@@ -134,11 +134,14 @@ def schedule_window():
         pageAction = request.values.get('pageAction')
     else:
         pageAction = ''
+    if 'eventId' in request.values:
+        id = request.values.get('eventId')
+    else:
+        id = -99
 
     # Grab variables for 'edit' pageAction
     eventData = []
     if pageAction == 'EditEvent':
-        id = request.values.get('eventId')
         eventobj = Event.query.filter_by(eventId=int(id))
         eventData += [ eventobj[0].eventId ]
         eventData += [ eventobj[0].eventDate ]
@@ -146,7 +149,7 @@ def schedule_window():
         eventData += [ eventobj[0].stopTime ]
         eventData += [ eventobj[0].eventName ]
         eventData += [ eventobj[0].eventLdr ]
-        eventData += [ eventobj[0].contactAccount ]
+        eventData += [ CONTACT_ABRVS[eventobj[0].contactAccount] ]
         eventData += [ eventobj[0].isAgreedTo ]
         eventData += [ eventobj[0].isEmailScheduled ]
         eventData += [ eventobj[0].isEmailSent ]
@@ -199,7 +202,7 @@ def schedule_window():
         abrvs_list = list(CONTACT_ABRVS.values())
         return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus,
                                 pageAction=pageAction, eventData=eventData, accounts=CONTACT_ACCOUNTS, minutes=minute_list, 
-                                mminutes=monthly_minutes, abrvs=abrvs_list)
+                                mminutes=monthly_minutes, abrvs=abrvs_list, eventId=id)
     else:
         # Redirect if the date has not been set.
         return redirect('/')
@@ -212,6 +215,13 @@ def newevent():
         else:
             return 0
     
+    def abrv_to_acct(abrv):
+        for each in CONTACT_ACCOUNTS:
+            if CONTACT_ABRVS[each] == abrv:
+                return each
+        else:
+            raise Exception("Unknown contact hour abbreviation provided.")
+    
     # Check that all required variables that are needed to create an event in the database are there.
     reqVarsExist = True
     meetingDate = request.values.get('meetingDate')
@@ -222,7 +232,10 @@ def newevent():
         # Create list of variable values.
         data = []
         for each in [ 'eventDate', 'startTime', 'stopTime', 'eventName', 'eventLdr', 'contactAccount' ]:
-            data += [ request.values.get(each) ]
+            if each == 'contactAccount':
+                data += [ abrv_to_acct(request.values.get(each)) ]
+            else:
+                data += [ request.values.get(each) ]
             
         # Calculate contact minutes for new events.
         data += [ convert_times_to_minutes(data[2], data[1]) ]
@@ -264,6 +277,14 @@ def editevent():
             return request.values.get(flag)
         else:
             return 0
+
+    def abrv_to_acct(abrv):
+        for each in CONTACT_ACCOUNTS:
+            if CONTACT_ABRVS[each] == abrv:
+                return each
+        else:
+            raise Exception("Unknown contact hour abbreviation provided.")
+
     meetingDate = request.values.get('meetingDate')
     id = request.values.get('eventId')
     status = "Event Updated"
@@ -273,7 +294,7 @@ def editevent():
     event.stopTime = request.values.get('stopTime')
     event.eventName = request.values.get('eventName')
     event.eventLdr = request.values.get('eventLdr')
-    event.contactAccount = request.values.get('contactAccount')
+    event.contactAccount = abrv_to_acct(request.values.get('contactAccount'))
 
     # Calculate new contact hours.
 
