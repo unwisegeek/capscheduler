@@ -167,7 +167,7 @@ def schedule_window():
         meetingDate = meetingDate.strftime('%Y-%m-%d')
 
         # Get results from DB
-        queryResults = Event.query.filter_by(eventDate=meetingDate)
+        queryResults = Event.query.filter_by(eventDate=meetingDate).order_by(Event.startTime)
         date = meetingDate.split('-')
         sortedQueryResults = []
         minutes = {}
@@ -299,7 +299,7 @@ def recalcstats():
             count_stats(date[0], date[1], eventQuery[i].contactAccount, eventQuery[i].contactMinutes) # year, month, acct, mins
             eventQuery[i].isStated = 1
             db.session.commit()
-    return redirect('/schedule?meetingDate={}'.format(meetingDate))
+    return redirect('/schedule?meetingDate={}&status=Stats Recalculated'.format(meetingDate))
     
 
 if __name__ == '__main__':
