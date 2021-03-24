@@ -16,7 +16,6 @@
             <input type="submit" value="Submit">
     </form>
     <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a>
-    <a href="/recalculatestats?meetingDate={{ meetingDate}}">Recalculate Stats</a>
     {% if status != '' %}
     <a href="">Status: {{ status }}</a>
     {% endif %}
@@ -26,32 +25,41 @@
     <!-- <h1 style="width: 80%; float: left;">Schedule</h1><h1 style="width: 20%; float: right;">Contact Hours</h1> -->
     <table id="left-table">
     <tr>
-        <th>Start</th>
-        <th>Stop</th>
-        <th>Event Name</th>
-        <th>Leader</th>
-        <th>Hours</th>
-        <th>Agreed To</th>
-        <th>Conf. Scheduled</th>
-        <th>Conf. Sent</th>
-        <th>Conf. Rcvd</th>
-        <th>Options</th>
+        <td></th>
+        <th></th>
+        <th id="detail-header" style="text-align: right;">Event&nbsp</th>
+        <th id="detail-header" style="text-align: left;">&nbspDetails</th>
+        <th></th>
+        <th></th>
+        <th id="email-header">Confirmation Emails</th>
+        <th></th>
+        <th></th>
+    </tr>
+    <tr>
+        <th id="detail-header">Start</th>
+        <th id="detail-header">Stop</th>
+        <th id="detail-header">Event Name</th>
+        <th id="detail-header">Leader</th>
+        <th id="detail-header">Hours</th>
+        <th id="email-header">Agreed To</th>
+        <th id="email-header">Scheduled</th>
+        <th id="email-header">Sent</th>
+        <th id="email-header">Rcvd</th>
     </tr>
     <tr>
     {% for result in results %}
     <tr>
         {% for elem in result %}
         {% if elem != result[0] and elem != result[1] %}
-        <td>
-            {% if elem == '0' %}&#9744
+            {% if elem == '0' %}
+                <td id="email">&#9744</td>
             {% else %}
                 {% if elem == '1' %}
-                    &#9745
+                <td id="email">&#9745</td>
                 {% else %}
-                    {{ elem }}
+                    <td id="detail">{{ elem }}</td>
                 {% endif %}
             {% endif %}
-        </td>
         {% endif %}
         {% endfor %}
         <td>
@@ -76,19 +84,10 @@
                 <td>{{ mminutes[i] }}</td>
             </tr>
         {% endfor %}
-        <!-- <tr>
-        {% for abrv in abrvs %}
-            <th>{{ abrv }}</th>
-        {% endfor %}
-    </tr>
-    <tr>
-        {% for min in minutes %}
-            <td>{{ min }}</td>
-        {% endfor %}
-    </tr> -->
     </table>
-{% if pageAction == 'AddEvent' %}
-<hr>
+    <a href="/recalculatestats?meetingDate={{ meetingDate}}" id="right-table">Recalculate Stats</a>
+    <hr>
+    {% if pageAction == 'AddEvent' %}
 <h1>New Event</h1>
 <table>
     <tr>
@@ -142,7 +141,6 @@
 <hr>
 {% endif %}
 {% if pageAction == 'EditEvent' %}
-<hr>
 <h1>Edit Event</h1>
 <table>
     <tr>

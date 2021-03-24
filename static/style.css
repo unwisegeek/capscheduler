@@ -83,6 +83,22 @@ body {
     text-align: center;
 }
 
+.content #detail-header {
+  background-color: rgb(155, 164, 216);
+}
+
+.content #email-header {
+  background-color: #a5a3a3;
+}
+
+.content #detail {
+  background-color: rgb(196, 203, 241);
+}
+
+.content #email {
+  background-color: #cecdcd;
+}
+
 /* Style the footer */
 .footer {
   background-color: #f1f1f1;
