@@ -141,15 +141,22 @@
     {% endif %}
     <table id="right-table">
         <tr>
-            <th></th>
+            <td></td>
             <th>D</th>
             <th>M</th>
         </tr>
         {% for i in range(0, abrvs | length) %}
             <tr>
-                <td><b>{{ abrvs[i] }}</b></td>
+                <th><b>{{ abrvs[i] }}</b></th>
                 <td>{{ minutes[i] }}</td>
-                <td>{{ mminutes[i] }}</td>
+                {% if abrvs[i] not in ['AE', 'CD', 'PT', 'LD'] %}<td>{{ mminutes[i] }}</td>
+                {% elif abrvs[i] == 'AE' and mminutes[i] < 90 %}<td style="color: red;">{{ mminutes[i] }}</td>
+                {% elif abrvs[i] == 'CD' and mminutes[i] < 60 %}<td style="color: red;">{{ mminutes[i] }}</td>
+                {% elif abrvs[i] == 'PT' and mminutes[i] < 60 %}<td style="color: red;">{{ mminutes[i] }}</td>
+                {% elif abrvs[i] == 'LD' and mminutes[i] < 90 %}<td style="color: red;">{{ mminutes[i] }}</td>
+                {% else %}
+                    <td style="color: green;">{{ mminutes[i] }}</td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>

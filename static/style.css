@@ -85,6 +85,10 @@ body {
     text-align: center;
 }
 
+.content #right-table th {background-color: #a5a3a3;}
+
+.content #right-table tr:nth-child(even) {background-color: #f2f2f2;}
+
 .content #detail-header {
   background-color: rgb(155, 164, 216);
 }
@@ -122,6 +126,7 @@ body {
   display: inline-block;
   box-sizing: border-box;
 }
+
 
 /* Style the footer */
 .footer {
