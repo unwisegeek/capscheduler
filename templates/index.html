@@ -44,6 +44,8 @@
         <th id="email-header">Scheduled</th>
         <th id="email-header">Sent</th>
         <th id="email-header">Rcvd</th>
+        <th id="email-header">Thnk</th>
+        <th></th>
     </tr>
     <tr>
     {% for result in results %}
@@ -66,6 +68,7 @@
         <td id="email"><input type="checkbox" name="isEmailScheduled" value="1" {% if eventData[8] == 1 %}checked{% endif %}></td>
         <td id="email"><input type="checkbox" name="isEmailSent" value="1" {% if eventData[9] == 1 %}checked{% endif %}></td>
         <td id="email"><input type="checkbox" name="isEmailConfirmed" value="1" {% if eventData[10] == 1 %}checked{% endif %}></td>
+        <td id="email"><input type="checkbox" name="isEmailThanked" value="1" {% if eventDate[11] == 1 %}checked{% endif %}></td>
             <input type="hidden" name="eventId" value="{{ eventData[0] }}">
             <input type="hidden" name="isDeleted" value="0">
             <input type="hidden" name="meetingDate" value="{{ meetingDate }}">
@@ -123,6 +126,9 @@
                     <input type="checkbox" id="isEmailConfirmed" name="isEmailConfirmed" value="1">
                 </td>
                 <td>
+                    <input type="checkbox" id="isEmailThanked" name="isEmailThanked" value="1">
+                </td>
+                <td>
                     <input type="hidden" id="isDeleted" name="isDeleted" value="0">
                     <input type="hidden" id="meetingDate" name="meetingDate" value="{{ meetingDate }}">
                     <!-- <input type="reset" value="Clear"> -->
@@ -136,7 +142,7 @@
     {% for n in range(9) %}
     <td></td>
     {% endfor %}
-    
+    <td></td>
     <td><a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent">Add Event</a></td>
     {% endif %}
     <table id="right-table">

@@ -155,6 +155,7 @@ def schedule_window():
         eventData += [ eventobj[0].isEmailScheduled ]
         eventData += [ eventobj[0].isEmailSent ]
         eventData += [ eventobj[0].isEmailConfirmed ]
+        eventData += [ eventobj[0].isEmailThanked ]
 
     if 'meetingDate' in request.values:
         meetingDate = request.values.get('meetingDate')
@@ -192,10 +193,11 @@ def schedule_window():
         for i in range(0, counter):
             if queryResults[i].isDeleted != 1:
                 minutes[CONTACT_ABRVS[queryResults[i].contactAccount]] += queryResults[i].contactMinutes
-                row = '{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}'.format(queryResults[i].eventId, queryResults[i].eventDate, queryResults[i].startTime, \
+                row = '{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}'.format(queryResults[i].eventId, queryResults[i].eventDate, queryResults[i].startTime, \
                                                              queryResults[i].stopTime, queryResults[i].eventName, queryResults[i].eventLdr, \
                                                              CONTACT_ABRVS[queryResults[i].contactAccount], queryResults[i].isAgreedTo, \
-                                                             queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, queryResults[i].isEmailConfirmed)
+                                                             queryResults[i].isEmailScheduled, queryResults[i].isEmailSent, queryResults[i].isEmailConfirmed, \
+                                                             queryResults[i].isEmailThanked)
                 sortedQueryResults += [ row.split('|') ]
         
         # Convert minute and abrvs dictionaries to lists before sending them:
@@ -241,7 +243,7 @@ def newevent():
         # Calculate contact minutes for new events.
         data += [ convert_times_to_minutes(data[2], data[1]) ]
 
-        for each in [ 'isAgreedTo', 'isEmailScheduled', 'isEmailSent', 'isEmailConfirmed' ]:
+        for each in [ 'isAgreedTo', 'isEmailScheduled', 'isEmailSent', 'isEmailConfirmed', 'isEmailThanked' ]:
             data += [ isin(each) ]
 
         # Create a new DB entry.
@@ -305,6 +307,7 @@ def editevent():
     event.isEmailScheduled = isin('isEmailScheduled')
     event.isEmailSent = isin('isEmailSent')
     event.isEmailConfirmed = isin('isEmailConfirmed')
+    event.isEmailThanked = isin('isEmailThanked')
     event.isEmailDeleted = isin('isDeleted')
     db.session.commit()
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
