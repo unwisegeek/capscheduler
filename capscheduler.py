@@ -88,12 +88,13 @@ class Event(db.Model):
     eventLdr = db.Column(db.String(80), unique=False, nullable=False)
     contactAccount = db.Column(db.String(20), unique=False, nullable=False)
     contactMinutes = db.Column(db.Integer, unique=False, nullable=False)
-    isAgreedTo = db.Column(db.Integer, unique=False, nullable=False)
-    isEmailScheduled = db.Column(db.Integer, unique=False, nullable=False)
-    isEmailSent = db.Column(db.Integer, unique=False, nullable=False)
-    isEmailConfirmed = db.Column(db.Integer, unique=False, nullable=False)
-    isDeleted = db.Column(db.Integer, unique=False, nullable=False)
-    isStated = db.Column(db.Integer, unique=False, nullable=False, default=0)
+    isAgreedTo = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
+    isEmailScheduled = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
+    isEmailSent = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
+    isEmailConfirmed = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
+    isEmailThanked = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
+    isDeleted = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
+    isStated = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
 
 class MonthlyStats(db.Model):
     __tablename__ = 'monthly-statistics'
