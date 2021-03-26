@@ -1,5 +1,6 @@
 import os
-from flask import Flask, render_template, request, redirect, sessions
+from flask import Flask, render_template, request, redirect, session
+from flask_session import Session
 from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Server, Manager
@@ -16,9 +17,15 @@ db = SQLAlchemy(app)
 if not os.path.exists('./.secret_key'):
     raise Exception('Please generate a secret key.\r\nEx: dd if=/dev/random bs=100M count=1 | sha256sum | cut -d ' ' -f1 > .secret_key')
 else:
-    app.secret_key = open('./.secret_key', 'r').read().encode('utf8')
+    app.config['SECRET_KEY'] = open('./.secret_key', 'r').read().encode('utf8')
+
+# Configure Server-side sessions
+app.config['SESSION_TYPE'] = 'sqlalchemy'
+app.config['SESSION_USE_SIGNER'] = True
+sess = Session()
 
 
+# Configure database migratiosn
 migrate = Migrate(app, db)
 manager = Manager(app)
 
@@ -115,15 +122,30 @@ if not os.path.exists('./capscheduler.db'):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # If the user arrives at the index page without a date, pick today.
-    if 'meetingDate' in request.values: # Date exists in POST or GET
-        meetingDate = request.values.get('meetingDate')
-        return redirect('/schedule?meetingDate={}'.format(meetingDate))
+    if 'meetingDate' in request.values or session.get('meetingDate', '-1') != '-1': # Date exists in POST or GET
+        meetingDate = session.get('meetingDate', '-1')
+        if meetingDate == '-1':
+            meetingDate = request.values.get('meetingDate')
+            session['meetingDate'] = meetingDate
+            return redirect('/schedule')
+        return redirect('/schedule')
     else: # Pick the next day that coincides with the meeting day.
         nextMeetingDay = date.today()
         while nextMeetingDay.weekday() != DAYNUM[meetingDay]:
             nextMeetingDay += timedelta(1)
         meetingDate = nextMeetingDay.strftime(DATEFMT)
-        return redirect('/schedule?meetingDate={}'.format(meetingDate))
+        session['meetingDate'] = meetingDate
+        return redirect('/schedule')
+
+    # if session.get('meetingDate', '-1') == '-1':
+    #     nextMeetingDate = date.today()
+    #     while nextMeetingDate.weekday() != DAYNUM[meetingDay]:
+    #         nextMeetingDay += timedelta(1)
+    #     meetingDate = nextMeetingDay.strftime(DATEFMT)
+    #     session['meetingDate'] = meetingDate
+    # else:
+    #     meetingDate = session.get('meetingDate', '-1')
+    # return redirect('/schedule')
 
 @app.route('/schedule', methods=['GET', 'POST'])
 def schedule_window():
@@ -158,7 +180,13 @@ def schedule_window():
         eventData += [ eventobj[0].isEmailThanked ]
 
     if 'meetingDate' in request.values:
-        meetingDate = request.values.get('meetingDate')
+        session['meetingDate'] = request.values.get('meetingDate')
+        return redirect('/schedule')
+
+    if 'meetingDate' in request.values or session.get('meetingDate', '-1') != "-1":
+        meetingDate = session.get('meetingDate', '-1')
+        if meetingDate == '-1':
+            meetingDate = request.values.get('meetingDate')
         # Account for meetingDate coming back in a different format
         if meetingDate[3] == '-': # Month First
             meetingDate = datetime.strptime(meetingDate, DATEFMT)
