@@ -1,7 +1,7 @@
-import os
+import os, hashlib, secrets, string
+from datetime import datetime, date, timedelta
 from flask import Flask, render_template, request, redirect, session
 from flask_session import Session
-from datetime import datetime, date, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Server, Manager
 from flask_migrate import Migrate, MigrateCommand
@@ -20,8 +20,8 @@ else:
     app.config['SECRET_KEY'] = open('./.secret_key', 'r').read().encode('utf8')
 
 # Configure Server-side sessions
-app.config['SESSION_TYPE'] = 'sqlalchemy'
-app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_TYPE'] = 'null'
+# app.config['SESSION_USE_SIGNER'] = True
 sess = Session()
 
 
@@ -112,16 +112,45 @@ class MonthlyStats(db.Model):
     contactAccount = db.Column(db.String(30), unique=False, nullable=False)
     contactMinutes = db.Column(db.Integer, unique=False, nullable=False)
     
-    
+class User(db.Model):
+    __tablename__ = 'users'
+    __table_args__ = { 'sqlite_autoincrement': True }
+    userId = db.Column(db.Integer, primary_key=True )
+    userFirstName = db.Column(db.String(30), unique=False, nullable=False )
+    userLastName = db.Column(db.String(30), unique=False, nullable=False )
+    userOrg = db.Column(db.String(30), unique=False, nullable=True )
+    userRank = db.Column(db.String(30), unique=False, nullable=False )
+    userEmail = db.Column(db.String(50), unique=True, nullable=False )
+    userPass = db.Column(db.String(128), unique=True, nullable=False )
+    user2FAEnabled = db.Column(db.Integer, unique=False, nullable=False, server_default = "0" )
+    user2FAKey = db.Column(db.String(32), unique=True, nullable=True, server_default = "" )
+    userLoginFails = db.Column(db.Integer, unique=False, nullable=False, server_default = "0" )
+    userLoginLock = db.Column(db.Integer, unique=False, nullable=False, server_default = "0" )
+    userPermissions = db.Column(db.String(128), unique=False, nullable=False, server_default = "viewer" )
 
 # Initialize the database file if one does not exist.
 if not os.path.exists('./capscheduler.db'):
     print('Creating database.')
     db.create_all()
-    
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # If the user arrives at the index page without a date, pick today.
+    # Get GET variables and come back with them in a session.
+    keylist = []
+    for each in request.values.keys():
+        keylist += [ each ]
+    
+    if len(keylist) > 0:
+        for each in request.values.keys():
+            session[each] = request.values.get(each)
+        return redirect('/')
+
+    pageStatus = session.get('status', '')
+    if not session.get('userId', False):
+        status = session.get('status', '')
+        session.clear()
+        return render_template('login.html', status=pageStatus)
+    # If the user arrives at the index page witho7ut a date, pick today.
     if 'meetingDate' in request.values or session.get('meetingDate', '-1') != '-1': # Date exists in POST or GET
         meetingDate = session.get('meetingDate', '-1')
         if meetingDate == '-1':
@@ -137,30 +166,36 @@ def index():
         session['meetingDate'] = meetingDate
         return redirect('/schedule')
 
-    # if session.get('meetingDate', '-1') == '-1':
-    #     nextMeetingDate = date.today()
-    #     while nextMeetingDate.weekday() != DAYNUM[meetingDay]:
-    #         nextMeetingDay += timedelta(1)
-    #     meetingDate = nextMeetingDay.strftime(DATEFMT)
-    #     session['meetingDate'] = meetingDate
-    # else:
-    #     meetingDate = session.get('meetingDate', '-1')
-    # return redirect('/schedule')
-
 @app.route('/schedule', methods=['GET', 'POST'])
 def schedule_window():
-    if 'status' in request.values:
-        pageStatus = request.values.get('status')
+    # If we get GET or POST variables, convert them to session data:
+    #session.clear()
+    
+    keylist = []
+    for each in request.values.keys():
+        keylist += [ each ]
+    
+    if len(keylist) > 0:
+        for each in request.values.keys():
+            session[each] = request.values.get(each)
+        return redirect('/schedule') # Come back with all GET variables converted to session
+
+    pageStatus = session.get('status', '')
+    pageAction = session.get('pageAction', '')
+    id = session.get('eventId', -99)
+
+    # Grab variabes for user data
+    userId = session.get('userId', False)
+    userData = []
+    if not userId:
+        return redirect('/')
     else:
-        pageStatus = ''
-    if 'pageAction' in request.values:
-        pageAction = request.values.get('pageAction')
-    else:
-        pageAction = ''
-    if 'eventId' in request.values:
-        id = request.values.get('eventId')
-    else:
-        id = -99
+        userobj = User.query.filter_by(userId=userId)
+        userData += [ userobj[0].userRank ]
+        userData += [ userobj[0].userFirstName ]
+        userData += [ userobj[0].userLastName ]
+        userData += [ userobj[0].userOrg ]
+        userData += [ userobj[0].userPermissions ]
 
     # Grab variables for 'edit' pageAction
     eventData = []
@@ -179,14 +214,9 @@ def schedule_window():
         eventData += [ eventobj[0].isEmailConfirmed ]
         eventData += [ eventobj[0].isEmailThanked ]
 
-    if 'meetingDate' in request.values:
-        session['meetingDate'] = request.values.get('meetingDate')
-        return redirect('/schedule')
-
-    if 'meetingDate' in request.values or session.get('meetingDate', '-1') != "-1":
+    if session.get('meetingDate', '-1') != "-1":
         meetingDate = session.get('meetingDate', '-1')
-        if meetingDate == '-1':
-            meetingDate = request.values.get('meetingDate')
+        
         # Account for meetingDate coming back in a different format
         if meetingDate[3] == '-': # Month First
             meetingDate = datetime.strptime(meetingDate, DATEFMT)
@@ -233,7 +263,7 @@ def schedule_window():
         abrvs_list = list(CONTACT_ABRVS.values())
         return render_template('index.html', meetingDate=meetingDate, prevDate=prevDate, nextDate=nextDate, results=sortedQueryResults, status=pageStatus,
                                 pageAction=pageAction, eventData=eventData, accounts=CONTACT_ACCOUNTS, minutes=minute_list, 
-                                mminutes=monthly_minutes, abrvs=abrvs_list, eventId=id)
+                                mminutes=monthly_minutes, abrvs=abrvs_list, eventId=id, session=session, userData=userData)
     else:
         # Redirect if the date has not been set.
         return redirect('/')
@@ -277,7 +307,7 @@ def newevent():
         # Create a new DB entry.
         newevent = Event(eventDate=data[0], startTime=data[1], stopTime=data[2], eventName=data[3], eventLdr=data[4], \
                          contactAccount=data[5], contactMinutes=data[6], isAgreedTo=data[7], isEmailScheduled=data[8], \
-                         isEmailSent=data[9], isEmailConfirmed=data[10], isDeleted=0)
+                         isEmailSent=data[9], isEmailConfirmed=data[10], isEmailThanked=data[11], isDeleted=0)
         # Commit the DB entry and send them back to the index page with the previous date.
         db.session.add(newevent)
         db.session.commit()
@@ -285,6 +315,15 @@ def newevent():
         # Add to statistics DB
         date = data[0].split('-')
         count_stats(date[0], date[1], data[5], data[6])
+        # Clear session variables that no longer need to be there
+        try: 
+            session.pop('pageAction')
+        except:
+            pass
+        try:
+            session.pop('eventId')
+        except:
+            pass
         # Redirect
         return redirect('/schedule?meetingDate={}&status=Event%20Added'.format(meetingDate))
     return redirect('/schedule?meetingDate={}&status=Error%20Adding%20Event'.format(meetingDate))
@@ -338,6 +377,14 @@ def editevent():
     event.isEmailThanked = isin('isEmailThanked')
     event.isEmailDeleted = isin('isDeleted')
     db.session.commit()
+    try: 
+        session.pop('pageAction')
+    except:
+        pass
+    try:
+        session.pop('eventId')
+    except:
+        pass
     return redirect('/schedule?meetingDate={}&status={}'.format(meetingDate, status))
 
 @app.route('/recalculatestats', methods=['GET', 'POST'])
@@ -353,7 +400,53 @@ def recalcstats():
             eventQuery[i].isStated = 1
             db.session.commit()
     return redirect('/schedule?meetingDate={}&status=Stats Recalculated'.format(meetingDate))
-    
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    foundUser = False
+    LOGIN_ERROR_REDIRECT = '/?status=Error has occurred. Please try again.'
+    try:
+        userName = request.values.get('userName')
+        userPass = request.values.get('userPass')
+    except:
+        userName = False
+        userPass = False
+
+    if userName != False and userPass != False:
+        userobj = User.query.filter_by(userEmail=userName)
+        try:
+            testVariable = userobj[0].userId
+        except:
+            return redirect(LOGIN_ERROR_REDIRECT)
+        salt = userobj[0].userPass[64:96]
+        passhash = userobj[0].userPass[0:64]
+
+        hashobj = hashlib.sha3_256()
+        hashobj.update(salt.encode('utf-8') + userPass.encode('utf-8'))
+
+        servhash = hashobj.hexdigest()
+
+        passed = False
+        if passhash == servhash:
+            passed = True
+            hashobj = ""
+            salt = ""
+            passhash = ""
+            servhash = ""
+        
+        if passed:
+            session['userId'] = userobj[0].userId
+            return redirect('/')
+        return redirect(LOGIN_ERROR_REDIRECT)
+    else:
+        session.clear()
+        return redirect(LOGIN_ERROR_REDIRECT)
+
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    session.clear()
+    return redirect('/')
 
 if __name__ == '__main__':
     #app.run(debug=True, host='0.0.0.0')
