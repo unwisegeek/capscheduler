@@ -17,6 +17,17 @@ body {
   background-color: #333;
 }
 
+.topnav select {
+  border: none;
+  background-color: #333;
+  color: #f2f2f2;
+  padding: 14px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
 .leftnav {
   margin-left: 1%;
 }
@@ -54,6 +65,30 @@ body {
     padding: 14px 16px;
     border: 2px solid #333;
 }
+
+.loginbox th {
+  color: black;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #333;
+  color: #f2f2f2;
+  min-width: 15%;
+  padding: 14px 16px;
+  z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
 
 /* Style the content */
 .content {
@@ -184,14 +219,4 @@ body {
   text-decoration: none;
   display: inline-block;
   box-sizing: border-box;
-}
-
-.loginbox th {
-  color: black;
-}
-
-/* Style the footer */
-.footer {
-  background-color: #f1f1f1;
-  padding: 10px;
 }

@@ -181,6 +181,8 @@ def schedule_window():
         return redirect('/schedule') # Come back with all GET variables converted to session
 
     pageStatus = session.get('status', '')
+    if pageStatus != '':
+        session.pop('status')
     pageAction = session.get('pageAction', '')
     id = session.get('eventId', -99)
 
@@ -447,6 +449,19 @@ def login():
 def logout():
     session.clear()
     return redirect('/')
+
+@app.route('/navmenu-handler', methods=['GET', 'POST'])
+def navmenu():
+    destination = request.values.get('destination', False)
+    referrer = request.values.get('referrer', False)
+    if destination and referrer:
+        if "'/{}'".format(destination) in str(app.url_map)  : # Confirm the selected menu item is a valid route
+            return redirect('/{}'.format(destination))
+        else:
+            return redirect('/{}?status=Option not implemented.'.format(referrer))
+    else:
+        return redirect('/')
+
 
 if __name__ == '__main__':
     #app.run(debug=True, host='0.0.0.0')
