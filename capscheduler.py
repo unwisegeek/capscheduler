@@ -462,6 +462,70 @@ def navmenu():
     else:
         return redirect('/')
 
+@app.route('/todo', methods=['GET'])
+def todoframe():
+    pagedata_1 = """
+    <html>
+    <head><title>ToDo List</title></head>
+    <body>
+    """
+    content = ""
+    pagedata_2 = """
+    </body>
+    </html>
+    """
+
+    # Things to report on:
+    # [X] Months out to three months in advance that are short on contact hours
+    # [ ] Days out to three months that do not have events scheduled at all
+    # [ ] Days out to three months that are not up on siteviz
+    # [ ] Days which have gaps or overlaps in the schedule, where ending time of previous does not match start time of next.
+    # [ ] Events with TBD in either the Event Name or Event Leader
+    # [ ] Events within two weeks that are not checked through Scheduled
+    # [ ] Events within one week that are not checked through Received
+    # [ ] Events that have occurred that do not have a thank you checked.
+
+    # Get the current date
+    today = datetime.today()
+    
+    # Extrapolate the next three month numbers from today's date
+    target_dates = [ {'year': today.year, 'month': today.month } ]
+    
+    # Build the target_dates list out
+    for i in range(1, 3):
+        cur_month = target_dates[i - 1]['month']
+        cur_year = target_dates[i - 1]['year']
+        if cur_month + 1 > 12:
+            next_month = 1
+            next_year = cur_year + 1
+        else:
+            next_month = cur_month + 1
+            next_year = cur_year
+        target_dates += [ { 'year': next_year, 'month': next_month } ]
+
+    # Get queries for those months from monthly-statistics
+    for i in range(0, len(target_dates)):
+        month = target_dates[i]['month']
+        year = target_dates[i]['year']
+        for acct in CONTACT_ACCT_REQS.keys():
+            statsobj = MonthlyStats.query.filter_by(statsYear=year).filter_by(statsMonth=month).filter_by(contactAccount=acct).first()
+            try:
+                if statsobj.contactMinutes < CONTACT_ACCT_REQS[acct]:
+                    content += "{}, {} only has {} contact hours for {}. Requires {}<br>".format(
+                        MONTHNUM[month],
+                        year,
+                        statsobj.contactMinutes,
+                        acct,
+                        CONTACT_ACCT_REQS[acct]
+                        )
+            except:
+                content += "{}, {} does not have contact hours for {}. Requires {}<br>".format(
+                    MONTHNUM[month],
+                    target_dates[i]['year'],
+                    acct,
+                    CONTACT_ACCT_REQS[acct]
+                )
+    return pagedata_1 + content + pagedata_2
 
 if __name__ == '__main__':
     #app.run(debug=True, host='0.0.0.0')
