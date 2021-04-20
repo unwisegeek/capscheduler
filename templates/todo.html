@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>To Do</title>
+<style>
+table, th, td {
+    align-content: center;
+    border: 2px solid black;
+    border-collapse:collapse;
+    margin: 10px 10px 10px 10px;
+    width: 100%;
+}
+
+th {
+    background: black;
+    color: #f2f2f2;
+    width: 80%;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+{% for i in range(0, months|length) %}
+<table>
+    <td style="width: 10%;"></td><th>{{ months[i] }}</th>
+    {% for item in items[i] %}
+        <tr><td style="width: 10%;"><a href="/schedule?meetingDate={{ item['date'] }}" target="_top">{{ item['date'] }}</a></td><td style="width: 90%;">{{ item['item'] }}</td></tr>
+    {% endfor %}
+</table>
+{% endfor %}
+{% endblock %}

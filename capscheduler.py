@@ -82,9 +82,15 @@ def uncount_stats(year, month, acct, mins):
         pass
     return
 
+def get_first_meeting_day(month, year):
+    targetDay = datetime.strptime("{}-{}-01".format(year, month), "%Y-%m-%d")
+    while targetDay.weekday() != DAYNUM[meetingDay]:
+        targetDay += timedelta(days=1)
+    return targetDay
+
 def get_meeting_dates_in_month(month, year):
     listOfDates = []
-    firstDay = datetime.strptime("{}-{}-01".format(year, month), "%Y-%m-%d")
+    firstDay = get_first_meeting_day(month, year)
     # Find the first meeting day
     while firstDay.weekday() != DAYNUM[meetingDay]:
         firstDay += timedelta(days=1)
@@ -477,17 +483,22 @@ def navmenu():
 
 @app.route('/todo', methods=['GET'])
 def todoframe():
+    listItems = []
+    listMonths = []
+    tmp_content = []
     def get_target_dates():
         target_dates = []
         nextMeetingDate = datetime.today()
-        while nextMeetingDate.day != DAYNUM[meetingDay]:
+        # Add this month so it's this month and the next three in advance.
+        target_dates = [ {'year': nextMeetingDate.year, 'month': nextMeetingDate.month } ]
+        while nextMeetingDate.weekday() != DAYNUM[meetingDay]:
             nextMeetingDate += timedelta(days=1)
     
         # Extrapolate the next three month numbers from today's date
         target_dates = [ {'year': nextMeetingDate.year, 'month': nextMeetingDate.month } ]
         
         # Build the target_dates list out
-        for i in range(1, 3):
+        for i in range(1, 4):
             cur_month = target_dates[i - 1]['month']
             cur_year = target_dates[i - 1]['year']
             if cur_month + 1 > 12:
@@ -500,7 +511,7 @@ def todoframe():
         return target_dates
 
     def contact_hour_check(targetDate):
-        new_content = ""    
+        new_content = []
 
         # Get queries for those months from monthly-statistics
         month = targetDate['month']
@@ -510,21 +521,17 @@ def todoframe():
             try:
                 if statsobj.contactMinutes < CONTACT_ACCT_REQS[acct]:
                     difference = CONTACT_ACCT_REQS[acct] - statsobj.contactMinutes
-                    new_content += "{}, {} requires {} additional {} minutes.<br>".format(
-                        MONTHNUM[month],
-                        year,
-                        difference,
-                        acct)
+                    new_content += [ { 'date': get_first_meeting_day(month, year).strptime(DATEFMT), 
+                                       'item': "HRS: Requires {} additional {} minutes.".format(difference, acct) 
+                    } ]
             except:
-                new_content += "{}, {} requires {} additional {} minutes.<br>".format(
-                    MONTHNUM[month],
-                    year,
-                    CONTACT_ACCT_REQS[acct],
-                    acct)
+                new_content += [ { 'date': datetime.strftime(get_first_meeting_day(month, year), DATEFMT),
+                                       'item': "HRS: Requires {} additional {} minutes.".format(CONTACT_ACCT_REQS[acct], acct) 
+                    } ]
         return new_content
 
     def empty_days_check(targetDate):
-        new_content = ""
+        new_content = []
         month = targetDate['month']
         year = targetDate['year']
 
@@ -533,28 +540,89 @@ def todoframe():
         for meeting in allMeetingDates:
             eventobj = Event.query.filter_by(eventDate=meeting)
             if result_length(eventobj) == 0:
-                new_content += "No events scheduled for {}<br>".format(meeting)
+                new_content += [ {'date': meeting, 'item': "NEV: No events scheduled."} ]
         return new_content
         
+    def gaps_in_time_check(targetDate):
+        new_content = []
+        month = targetDate['month']
+        year = targetDate['year']
+
+        allMeetingDates = get_meeting_dates_in_month(month, year)
+
+        for meeting in allMeetingDates:
+            eventobj = Event.query.filter_by(eventDate=meeting).filter_by(isDeleted=0).order_by(Event.startTime)
+            query_length = result_length(eventobj)
+            for i in range(0, query_length - 1):
+                if eventobj[i].stopTime != eventobj[i + 1].startTime:
+                    msg = "GAP: Event from {} to {} has a gap prior to the following event.".format(
+                        eventobj[i].startTime, eventobj[i].stopTime )
+                    new_content += [ {'date': meeting, 'item': msg } ]
+        return new_content
+            
+    def tbd_check(targetDate):
+        new_content = []
+        month = targetDate['month']
+        year = targetDate['year']
+
+        allMeetingDates = get_meeting_dates_in_month(month, year)
+
+        for meeting in allMeetingDates:
+            eventobj = Event.query.filter_by(eventDate=meeting).filter_by(isDeleted=0).order_by(Event.startTime)
+            query_length = result_length(eventobj)
+            for i in range(0, query_length):
+                if 'TBD' in eventobj[i].eventName:
+                    msg = "TBD: Event '{}' has an event name to be determined.".format(
+                        eventobj[i].eventName )
+                    new_content += [ {'date': meeting, 'item': msg } ]
+                if 'TBD' in eventobj[i].eventLdr:
+                    msg = "TBD: Event '{}' has an event leader to be determined.".format(
+                        eventobj[i].eventName )
+                    new_content += [ {'date': meeting, 'item': msg } ]
+        return new_content
+    
+    def scheduled_check():
+        new_content = []
+        next_meet = datetime.today()
+        next_meeting_dates = []
+        while next_meet.weekday() != DAYNUM[meetingDay]:
+            next_meet += timedelta(days=1)
+        for week in range(0, 2):
+            offset = 7 * week
+            next_meeting_dates += [ next_meet + timedelta(days=offset) ]
+        for meeting in next_meeting_dates:
+            meeting_date = meeting.strftime(DATEFMT)
+            eventobj = Event.query.filter_by(eventDate=meeting_date).filter_by(isDeleted=0).order_by(Event.startTime)
+            for n in range(0, result_length(eventobj)):
+                msg = ""
+                missing_flag_list = []
+                missing_flag_str = ""
+                event_name = ""
+                event_name = eventobj[n].eventName
+                if eventobj[n].isAgreedTo != 1:
+                    missing_flag_list += [ "isAgreedTo" ]
+                if eventobj[n].isEmailScheduled != 1:
+                    missing_flag_list += [ "isEmailScheduled" ]
+                for n in range(0, len(missing_flag_list)):
+                    if n != len(missing_flag_list):
+                        missing_flag_str += "{}, ".format(missing_flag_list[n])
+                    else:
+                        missing_flag_str += "and {} ".format(missing_flag_list[n])
+                if len(missing_flag_list) > 0:
+                    msg += "FLG: {} flags are missing from event '{}'".format(missing_flag_str, event_name)
+                    new_content += [{ 'date': meeting_date, 'item': msg }]
+        return new_content
+            
+
 
     # Begin main todo page logic
-    pagedata_1 = """
-    <html>
-    <head><title>ToDo List</title></head>
-    <body>
-    """
-    content = ""
-    pagedata_2 = """
-    </body>
-    </html>
-    """
-
+        
     # Things to report on:
     # [X] Months out to three months in advance that are short on contact hours
-    # [ ] Days out to three months that do not have events scheduled at all
-    # [ ] Days which have gaps or overlaps in the schedule, where ending time of previous does not match start time of next.
-    # [ ] Events with TBD in either the Event Name or Event Leader
-    # [ ] Events within two weeks that are not checked through Scheduled
+    # [X] Days out to three months that do not have events scheduled at all
+    # [x] Days which have gaps or overlaps in the schedule, where ending time of previous does not match start time of next.
+    # [X] Events with TBD in either the Event Name or Event Leader
+    # [X] Events within two weeks that are not checked through Scheduled
     # [ ] Events within one week that are not checked through Received
     # [ ] Events that have occurred that do not have a thank you checked.
     # [ ] Days out to three months that are not up on siteviz
@@ -563,12 +631,25 @@ def todoframe():
     target_dates = get_target_dates()
     
     for each in target_dates:
-       content += contact_hour_check(each)
-       content += empty_days_check(each)
+        tmp_content += contact_hour_check(each)
+        tmp_content += empty_days_check(each)
+        tmp_content += gaps_in_time_check(each)
+        tmp_content += tbd_check(each)
+        # tmp_content += scheduled_check()
+        # Bubblesort listItems by the 'date'
+        n = len(tmp_content)
+        for i in range(n-1):
+            for j in range(0, n-i-1):
+                if datetime.strptime(tmp_content[j]['date'], DATEFMT) > datetime.strptime(tmp_content[j+1]['date'], DATEFMT):
+                    tmp_content[j], tmp_content[j+1] = tmp_content[j+1], tmp_content[j]
+        listItems += [ tmp_content ]
+        listMonths += [ MONTHNUM[each['month']] ]
+        tmp_content = []
 
-    listOfMeetings = get_meeting_dates_in_month(3, 2021)
+    listItems += [ scheduled_check() ]
+    listMonths += [ "Notices" ]
 
-    return pagedata_1 + content + pagedata_2
+    return render_template('todo.html', items=listItems, months=listMonths)
 
 if __name__ == '__main__':
     #app.run(debug=True, host='0.0.0.0')
