@@ -1,4 +1,5 @@
-import os, hashlib, secrets, string
+#import os, hashlib, secrets, string
+import os, hashlib, string
 from datetime import datetime, date, timedelta
 from flask import Flask, render_template, request, redirect, session
 from flask_session import Session
@@ -8,13 +9,15 @@ from flask_migrate import Migrate, MigrateCommand
 
 from config import *
 
+os.chdir(INSTALL_DIR)
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Check for secret_key file.
-if not os.path.exists('./.secret_key'):
+if not os.path.exists('.secret_key'):
     raise Exception('Please generate a secret key.\r\nEx: dd if=/dev/random bs=100M count=1 | sha256sum | cut -d ' ' -f1 > .secret_key')
 else:
     app.config['SECRET_KEY'] = open('./.secret_key', 'r').read().encode('utf8')
@@ -442,12 +445,13 @@ def login():
         salt = userobj[0].userPass[64:96]
         passhash = userobj[0].userPass[0:64]
 
-        hashobj = hashlib.sha3_256()
+        hashobj = hashlib.sha256()
         hashobj.update(salt.encode('utf-8') + userPass.encode('utf-8'))
 
         servhash = hashobj.hexdigest()
 
         passed = False
+
         if passhash == servhash:
             passed = True
             hashobj = ""
