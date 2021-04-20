@@ -52,3 +52,5 @@ CONTACT_ACCT_REQS = {
 DATEFMT = '%Y-%m-%d'
 
 meetingDay = 'Thursday'
+
+INSTALL_DIR = '/var/www/capscheduler'
