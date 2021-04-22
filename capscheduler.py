@@ -692,7 +692,13 @@ def todoframe():
         listMonths += [ MONTHNUM[each['month']] ]
         tmp_content = []
 
-    listNotices += thanked_check()
+    tmp_notices = thanked_check()
+    n = len(tmp_notices)
+    for i in range(n-1):
+        for j in range(0, n-i-1):
+            if datetime.strptime(tmp_notices[j]['date'], DATEFMT) > datetime.strptime(tmp_notices[j+1]['date'], DATEFMT):
+                tmp_notices[j], tmp_notices[j+1] = tmp_notices[j+1], tmp_notices[j]
+    listNotices += tmp_notices
     listMonths += [ "Notices" ]
 
     return render_template('todo.html', items=listItems, months=listMonths, notices=listNotices)
