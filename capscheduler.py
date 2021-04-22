@@ -656,7 +656,7 @@ def todoframe():
         while next_meet.weekday() != DAYNUM[meetingDay]:
             next_meet += timedelta(days=1)
         formated_date = next_meet.strftime(DATEFMT)
-        eventobj = Event.query.filter_by(isEmailThanked != 1)
+        eventobj = Event.query.filter_by(Event.isEmailThanked != 1)
         for n in result_length(eventobj):
             if datetime.strptime(eventobj[n].eventDate, DATEFMT) < formated_date:
                 msg = "FLG: isThanked flag is missing from {}".format(eventobj[n].eventName )
