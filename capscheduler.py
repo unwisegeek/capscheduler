@@ -647,6 +647,21 @@ def todoframe():
                     new_content += [{ 'date': meeting_date, 'item': msg }]
         return new_content
 
+    def thanked_check():
+        new_content = []
+        msg = ""
+        next_meet = datetime.today()
+        next_meeting_dates = []
+        while next_meet.weekday() != DAYNUM[meetingDay]:
+            next_meet += timedelta(days=1)
+        formated_date = next_meet.strftime(DATEFMT)
+        eventobj = Event.query.filter_by(isEmailThanked != 1)
+        for n in result_length(eventobj):
+            if datetime.strptime(eventobj[n].eventDate, DATEFMT) < formated_date:
+                msg = "FLG: isThanked flag is missing from {}".format(eventobj[n].eventName )
+                new_content += [{ 'date': eventobj[n].eventDate, 'item': msg }]
+        return new_content
+
     # Begin main todo page logic
         
     # Things to report on:
@@ -656,7 +671,7 @@ def todoframe():
     # [X] Events with TBD in either the Event Name or Event Leader
     # [X] Events within two weeks that are not checked through Scheduled
     # [X] Events within one week that are not checked through Received
-    # [ ] Events that have occurred that do not have a thank you checked.
+    # [X] Events that have occurred that do not have a thank you checked.
     # [ ] Days out to three months that are not up on siteviz
 
     # Get months and year of next three months.
@@ -667,7 +682,7 @@ def todoframe():
         tmp_content += empty_days_check(each)
         tmp_content += gaps_in_time_check(each)
         tmp_content += tbd_check(each)
-        # tmp_content += scheduled_check()
+        tmp_content += scheduled_check()
         # Bubblesort listItems by the 'date'
         n = len(tmp_content)
         for i in range(n-1):
