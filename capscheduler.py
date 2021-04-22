@@ -654,7 +654,7 @@ def todoframe():
         next_meet = datetime.today()
         while next_meet.weekday() != DAYNUM[meetingDay]:
             next_meet += timedelta(days=1)
-        eventobj = Event.query.filter_by(isEmailThanked=0)
+        eventobj = Event.query.filter_by(isDeleted=0).filter_by(isEmailThanked=0)
         for n in range(0, result_length(eventobj)):
             if datetime.strptime(eventobj[n].eventDate, DATEFMT) < next_meet:
                 msg = "TYVM: Send thank you note to {} for {}".format(eventobj[n].eventLdr, eventobj[n].eventName )
