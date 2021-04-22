@@ -1,8 +1,19 @@
 TODO
 
-[ ] - Decide on TUI library
-[ ] - List Dates
-[ ] - Add events to dates
-[ ] - Add instructor, contact hour category to count against
-[ ] - Add assistant functionality to fill in blank fields.
+[X] - Decide on TUI library
+[X] - List Dates
+[X] - Add events to dates
+[X] - Add instructor, contact hour category to count against
+[X] - Add assistant functionality to fill in blank fields.
 [ ] - Alexa integrations? Maybe?
+
+Three months later...
+
+[ ] - Add checks to todo.html for Siteviz
+[ ] - Add initial configuration with a one-time use endpoint, maybe?
+[ ] - Add Two-Factor Authentication
+[ ] - Add profile page
+[ ] - Add ability to change password
+[ ] - Add ability to specify admin user(s)
+[ ] - Add user permissions (Admin, Senior, Cadet)
+[ ] - Database migrations from one instance to another
