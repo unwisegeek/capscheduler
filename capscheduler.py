@@ -490,6 +490,7 @@ def todoframe():
     listItems = []
     listMonths = []
     tmp_content = []
+    otherNotices = []
     def get_target_dates():
         target_dates = []
         nextMeetingDate = datetime.today()
@@ -693,10 +694,10 @@ def todoframe():
         listMonths += [ MONTHNUM[each['month']] ]
         tmp_content = []
 
-    listItems += [ scheduled_check() ]
+    otherNotices = [ thanked_check() ]
     listMonths += [ "Notices" ]
 
-    return render_template('todo.html', items=listItems, months=listMonths)
+    return render_template('todo.html', items=listItems, months=listMonths, notices=otherNotices)
 
 if __name__ == '__main__':
     #app.run(debug=True, host='0.0.0.0')
