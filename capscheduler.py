@@ -12,7 +12,7 @@ from config import *
 os.chdir(INSTALL_DIR)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///capscheduler-db/capscheduler.db'.format(INSTALL_DIR)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
