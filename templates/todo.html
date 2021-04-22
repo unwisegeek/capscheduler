@@ -27,10 +27,11 @@ th {
         {% for i in range(0, notices|length) %}
         <tr><td style="width: 10%;"><a href="/schedule?meetingDate={{ notices[i]['date'] }}" target="_top">{{ notices[i]['date'] }}</a></td><td style="width: 90%;">{{ notices[i]['item'] }}</td></tr>
         {% endfor %}
-    {% endif %}
+    {% else %}
     {% for item in items[i] %}
         <tr><td style="width: 10%;"><a href="/schedule?meetingDate={{ item['date'] }}" target="_top">{{ item['date'] }}</a></td><td style="width: 90%;">{{ item['item'] }}</td></tr>
     {% endfor %}
+    {% endif %}
 </table>
 {% endfor %}
 {% endblock %}

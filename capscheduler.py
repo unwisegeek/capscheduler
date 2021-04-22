@@ -490,7 +490,7 @@ def todoframe():
     listItems = []
     listMonths = []
     tmp_content = []
-    otherNotices = []
+    listNotices = []
     def get_target_dates():
         target_dates = []
         nextMeetingDate = datetime.today()
@@ -652,14 +652,12 @@ def todoframe():
         new_content = []
         msg = ""
         next_meet = datetime.today()
-        next_meeting_dates = []
         while next_meet.weekday() != DAYNUM[meetingDay]:
             next_meet += timedelta(days=1)
-        formated_date = next_meet.strftime(DATEFMT)
-        eventobj = Event.query.filter_by(isEmailThanked=1)
+        eventobj = Event.query.filter_by(isEmailThanked=0)
         for n in range(0, result_length(eventobj)):
-            if datetime.strptime(eventobj[n].eventDate, DATEFMT) < formated_date:
-                msg = "FLG: isThanked flag is missing from {}".format(eventobj[n].eventName )
+            if datetime.strptime(eventobj[n].eventDate, DATEFMT) < next_meet:
+                msg = "TYVM: Send thank you note to {} for {}".format(eventobj[n].eventLdr, eventobj[n].eventName )
                 new_content += [{ 'date': eventobj[n].eventDate, 'item': msg }]
         return new_content
 
@@ -694,12 +692,12 @@ def todoframe():
         listMonths += [ MONTHNUM[each['month']] ]
         tmp_content = []
 
-    otherNotices = [ thanked_check() ]
+    listNotices += thanked_check()
     listMonths += [ "Notices" ]
 
-    return render_template('todo.html', items=listItems, months=listMonths, notices=otherNotices)
+    return render_template('todo.html', items=listItems, months=listMonths, notices=listNotices)
 
 if __name__ == '__main__':
-    #app.run(debug=True, host='0.0.0.0')
-    manager.run()
+    app.run(debug=True, host='0.0.0.0')
+    #manager.run()
 
