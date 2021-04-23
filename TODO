@@ -7,13 +7,28 @@ TODO
 [X] - Add assistant functionality to fill in blank fields.
 [ ] - Alexa integrations? Maybe?
 
-Three months later...
-
+Items needed for v1 (and switch to main branch)
+[ ] - Templates!
 [ ] - Add checks to todo.html for Siteviz
 [ ] - Add initial configuration with a one-time use endpoint, maybe?
 [ ] - Add Two-Factor Authentication
 [ ] - Add profile page
+[ ] - Add configuration page
+    -- Maybe switch configuration to ini style with configparser or flat JSON file
 [ ] - Add ability to change password
 [ ] - Add ability to specify admin user(s)
-[ ] - Add user permissions (Admin, Senior, Cadet)
+[ ] - Add user permissions (Admin, User)
+[ ] - Add page that is easily added to email
+
+Future Features
 [ ] - Database migrations from one instance to another
+[ ] - Checks for Cadet Protection Expirations
+[ ] - Checks for Membership Expirations
+[ ] - Non-Meeting Event Tracking
+[ ] - Squadron Commander's Deliverables Tracking
+[ ] - Other officer deliverables Tracking
+[ ] - Modularization to make adding additional features easier?
+    -- I think this is getting a little out of hand...
+
+Issues
+[ ] - DB doesn't seem to be encrypted on the disk
