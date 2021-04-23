@@ -8,19 +8,19 @@ TODO
 [ ] - Alexa integrations? Maybe?
 
 Items needed for v1 (and switch to main branch)
-[ ] - Templates!
-[ ] - Add checks to todo.html for Siteviz
-[ ] - Add initial configuration with a one-time use endpoint, maybe?
-[ ] - Add Two-Factor Authentication
-[ ] - Add profile page
+[ ] - Add page that is easily added to email
 [ ] - Add configuration page
     -- Maybe switch configuration to ini style with configparser or flat JSON file
+[ ] - Add initial configuration with a one-time use endpoint, maybe?
+[ ] - Add profile page
 [ ] - Add ability to change password
+[ ] - Add Two-Factor Authentication
 [ ] - Add ability to specify admin user(s)
 [ ] - Add user permissions (Admin, User)
-[ ] - Add page that is easily added to email
+[ ] - Add checks to todo.html for Siteviz
 
 Future Features
+[ ] - Templates!
 [ ] - Database migrations from one instance to another
 [ ] - Checks for Cadet Protection Expirations
 [ ] - Checks for Membership Expirations
