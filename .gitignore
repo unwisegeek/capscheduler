@@ -127,7 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
 test.py
 capscheduler.db
 .gitignore
 .secret_key
+config.py
