@@ -8,6 +8,7 @@ from flask_script import Server, Manager
 from flask_migrate import Migrate, MigrateCommand
 
 from config import *
+from const import *
 
 os.chdir(INSTALL_DIR)
 
