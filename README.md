@@ -21,4 +21,5 @@ Create the virtual environment: virtualenv venv
 Activate the virtual environment: source ./venv/bin/activate
 Install the requirements: pip3 install -r requirements.txt
 Create a secret key or move an existing secret key to the capscheduler directory: dd if=/dev/urandom bs=4096 count=100 | sha256sum > .secret_key
-Create WSGI file (see example) to import capscheduler's app as applicatio
+Copy sampleconfig.py to config.py and modify to suit your needs.
+Create WSGI file (see example) to import capscheduler's app as application or run ./start
