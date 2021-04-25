@@ -19,6 +19,13 @@
         <a href="/schedule?meetingDate={{ prevDate }}"><<</a>
         <a href="#">{{ meetingDate }}</a>
         <a href="/schedule?meetingDate={{ nextDate }}">>></a>
+        <form action="frame-handler" method="post">
+            <input type="hidden" name="referrer" value="schedule">
+            <select name="destination" id="destination" onchange="this.form.submit()">
+                <option value="blank" selected>Default</option>
+                <option value="todo">Profile</option>
+            </select>
+        </form>
     </div>
     <div class="rightnav">
         <form action="navmenu-handler" method="post">
@@ -196,6 +203,5 @@
     <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent" id="right-table" style="margin-top: 10px;">Add Event</a>
 </div>
 </div>
-<iframe src="/todo" height="1000" width="80%" style="margin: 5px 5px 5px 5px;">
-</iframe>
+<iframe src="/frame" height="400" width="99%" style="margin: 5px 5px 5px 5px;"></iframe>
 {% endblock %}
