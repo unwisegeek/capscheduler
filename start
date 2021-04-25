@@ -2,5 +2,5 @@
 
 # Simple script to start a test server to look at code changes
 # locally before pushing to Github.
-. venv/bin/activate
-python capscheduler.py runserver
+source venv/bin/activate
+python3 capscheduler.py runserver

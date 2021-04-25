@@ -114,8 +114,26 @@
             <a href="/delete?meetingDate={{ meetingDate }}&eventId={{ result[0] }}">Delete</a>
         </td>
         {% endif %}
-    </tr>
+        </tr>
     {% endfor %}
+    <!-- Add additional lines if less than 6 results given -->
+    {% if results|length < 7 %}
+        {% for i in range(0, 7 - results|length) %}
+            <tr>
+                {% for j in range(0, 10) %}
+                    {% if j < 5 %}
+                        <td id="detail">&nbsp;</td>
+                    {% else %}
+                        <td id="email">&nbsp;</td>
+                    {% endif %}
+                {% endfor %}
+                <td>
+                    <a href="/schedule">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</a>
+                    <a href="/schedule">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</a>
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
     </tr>
 
     <!-- Set up the page for when it detects an AddEvent status. -->
@@ -192,10 +210,9 @@
             </tr>
         {% endfor %}
     </table>
-    <a href="/recalculatestats?meetingDate={{ meetingDate}}" id="right-table" style="margin-top: 10px;">Recalculate Stats</a><br>
-    <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent" id="right-table" style="margin-top: 10px;">Add Event</a>
+    <a href="/recalculatestats?meetingDate={{ meetingDate}}" id="right-table" style="margin-top: 5px;">Recalculate Stats</a><br>
+    <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=AddEvent" id="right-table" style="margin-top: 5px;">Add Event</a>
 </div>
 </div>
-<iframe src="/todo" height="1000" width="80%" style="margin: 5px 5px 5px 5px;">
-</iframe>
+<iframe src="/frame" height="400" width="99%" style="margin: 5px 5px 5px 5px;"></iframe>
 {% endblock %}
