@@ -19,13 +19,6 @@
         <a href="/schedule?meetingDate={{ prevDate }}"><<</a>
         <a href="#">{{ meetingDate }}</a>
         <a href="/schedule?meetingDate={{ nextDate }}">>></a>
-        <form action="frame-handler" method="post">
-            <input type="hidden" name="referrer" value="schedule">
-            <select name="destination" id="destination" onchange="this.form.submit()">
-                <option value="blank" selected>Default</option>
-                <option value="todo">Profile</option>
-            </select>
-        </form>
     </div>
     <div class="rightnav">
         <form action="navmenu-handler" method="post">
@@ -121,8 +114,22 @@
             <a href="/delete?meetingDate={{ meetingDate }}&eventId={{ result[0] }}">Delete</a>
         </td>
         {% endif %}
-    </tr>
+        </tr>
     {% endfor %}
+    <!-- Add additional lines if less than 6 results given -->
+    {% if results|length < 6 %}
+        {% for i in range(0, 6 - results|length) %}
+            <tr>
+                {% for j in range(0, 10) %}
+                    {% if j < 5 %}
+                        <td id="detail">&nbsp;</td>
+                    {% else %}
+                        <td id="email">&nbsp;</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    {% endif %}
     </tr>
 
     <!-- Set up the page for when it detects an AddEvent status. -->
