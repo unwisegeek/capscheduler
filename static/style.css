@@ -104,7 +104,7 @@ body {
 .content a:link, a:visited {
   background-color: #333;
   color: #f2f2f2;
-  padding: 14px 25px;
+  padding: 5px 25px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -114,7 +114,7 @@ body {
 .content a:hover {
     background-color: #f2f2f2;
     color: #333;
-    padding: 14px 25px;
+    padding: 5px 25px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -157,7 +157,7 @@ body {
   width: auto;
   background-color: #333;
   color: #f2f2f2;
-  padding: 14px 25px;
+  padding: 5px 25px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -168,7 +168,7 @@ body {
   width: auto;
   background-color: #f2f2f2;
   color: #333;
-  padding: 14px 25px;
+  padding: 5px 25px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
