@@ -8,13 +8,13 @@ TODO
 [ ] - Alexa integrations? Maybe?
 
 Items needed for v1 (and switch to main branch)
-[ ] - Change bottom iframe to "on demand" to save page loading time by not loading todo unless needed. 
+[X] - Change bottom iframe to "on demand" to save page loading time by not loading todo unless needed. 
 [ ] - Add page that is easily added to email
 [ ] - Add configuration page
     -- Maybe switch configuration to ini style with configparser or flat JSON file
 [ ] - Add initial configuration with a one-time use endpoint, maybe?
 [ ] - Add profile page
-[ ] - Add ability to change password
+[ ] - Implement OAuth2 with oauthlib and Flask-Login
 [ ] - Add Two-Factor Authentication
 [ ] - Add ability to specify admin user(s)
 [ ] - Add user permissions (Admin, User)
