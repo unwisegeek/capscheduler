@@ -136,4 +136,4 @@ config.py
 .pre-commit-config.yaml
 .vscode/tasks.json
 .isort.cfg
-capscheduler-db
+capscheduler-db/
