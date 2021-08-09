@@ -8,7 +8,7 @@ TODO
 [ ] - Alexa integrations? Maybe?
 
 Items needed for v1 (and switch to main branch)
-[ ] - Change bottom iframe to "on demand" to save page loading time by not loading todo unless needed. 
+[ ] - Change bottom iframe to "on demand" to save page loading time by not loading todo unless needed.
 [ ] - Add page that is easily added to email
 [ ] - Add configuration page
     -- Maybe switch configuration to ini style with configparser or flat JSON file

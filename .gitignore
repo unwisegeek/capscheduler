@@ -133,3 +133,6 @@ capscheduler.db
 .gitignore
 .secret_key
 config.py
+.pre-commit-config.yaml
+.vscode/tasks.json
+.isort.cfg

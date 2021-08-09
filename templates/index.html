@@ -94,7 +94,7 @@
         <td>
             <a href="/schedule?meetingDate={{ meetingDate }}&pageAction=&status=Edit Cancelled">Abort</a>
             <input type="submit" onclick="return confirm('Are you sure you want to edit this event with the values in the fields below?')" value="Submit"></td>
-        </form>        
+        </form>
         {% else %} <!-- Show the events regularly, without editing. -->
         {% for elem in result %}
         {% if elem != result[0] and elem != result[1] %}
