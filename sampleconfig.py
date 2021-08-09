@@ -9,4 +9,9 @@ meetingDay = "Thursday"
 # meetingDay = "Saturday"
 # meetingDay = "Sunday"
 
-INSTALL_DIR = "/home/john/Projects/capscheduler"
+INSTALL_DIR = "/var/www/capscheduler"
+
+# Google OAuth Details
+GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_SECRET = ""
+GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"

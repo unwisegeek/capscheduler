@@ -1,14 +1,30 @@
 import hashlib
+import json
 import os
 from datetime import date, datetime, timedelta
 
+import requests
 from flask import Flask, redirect, render_template, request, session
+from flask_login import (
+    LoginManager,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Server
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
+from oauthlib.oauth2 import WebApplicationClient
 
-from config import INSTALL_DIR, meetingDay
+from config import (
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+    GOOGLE_DISCOVERY_URL,
+    INSTALL_DIR,
+    meetingDay,
+)
 from const import (
     CONTACT_ABRVS,
     CONTACT_ACCOUNTS,
@@ -33,6 +49,13 @@ if not os.path.exists(".secret_key"):
     )
 else:
     app.config["SECRET_KEY"] = open("./.secret_key", "r").read().encode("utf8")
+
+# Flask User session management
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# Oauth 2 Client Setup
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 # Configure Server-side sessions
 app.config["SESSION_TYPE"] = "null"
@@ -203,6 +226,24 @@ class User(db.Model):
     userPermissions = db.Column(
         db.String(128), unique=False, nullable=False, server_default="viewer"
     )
+    userProfilePic = db.Column(
+        db.String(256), unique=False, nullable=False, server_default=""
+    )
+
+    def is_active(self):
+        if self.userLoginLock == "0":
+            return True
+        else:
+            return False
+
+    def get_id(self):
+        return self.userId
+
+
+@login_manager.user_loader
+def load_user(email):
+    user = User.query.filter_by(userEmail=str(email)).first()
+    return user
 
 
 # Initialize the database file if one does not exist.
@@ -566,44 +607,59 @@ def recalcstats():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
+    auth_endpoint = google_provider_cfg["authorization_endpoint"]
+
+    request_uri = client.prepare_request_uri(
+        auth_endpoint,
+        redirect_uri="http://localhost:5000/callback",
+        scope=["openid", "profile", "email"],
+    )
+    return redirect(request_uri)
+
+
+@app.route("/callback", methods=["GET"])
+def callback():
     LOGIN_ERROR_REDIRECT = "/?status=Error has occurred. Please try again."
-    userName = request.values.get("userName", False)
-    userPass = request.values.get("userPass", False)
+    authorization_code = request.args.get("code")
+    google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
+    token_endpoint = google_provider_cfg["token_endpoint"]
+    token_url, headers, body = client.prepare_token_request(
+        token_endpoint,
+        authroization_response=request.url,
+        redirect_url=request.base_url,
+        code=authorization_code,
+    )
+    token_response = requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
+    )
+    client.parse_request_body_response(json.dumps(token_response.json()))
 
-    if userName and userPass:
-        userobj = User.query.filter_by(userEmail=userName)
-        try:
-            type(userobj[0].userId)
-        except IndexError:
-            return redirect(LOGIN_ERROR_REDIRECT)
-        salt = userobj[0].userPass[64:96]
-        passhash = userobj[0].userPass[0:64]
+    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
+    uri, headers, body = client.add_token(userinfo_endpoint)
+    userinfo_response = requests.get(uri, headers=headers, data=body)
 
-        hashobj = hashlib.sha256()
-        hashobj.update(salt.encode("utf-8") + userPass.encode("utf-8"))
-
-        servhash = hashobj.hexdigest()
-
-        passed = False
-
-        if passhash == servhash:
-            passed = True
-            hashobj = ""
-            salt = ""
-            passhash = ""
-            servhash = ""
-
-        if passed:
-            session["userId"] = userobj[0].userId
+    if userinfo_response.json().get("email_verified"):
+        users_email = userinfo_response.json()["email"]
+        userobj = User.query.filter_by(userEmail=users_email).first()
+        if userobj:
+            session["userId"] = userobj.userId
+            login_user(userobj)
             return redirect("/")
-        return redirect(LOGIN_ERROR_REDIRECT)
+        else:
+            return redirect(
+                "/?status=User not authorized use of this resource. Signup feature coming soon."
+            )
     else:
-        session.clear()
         return redirect(LOGIN_ERROR_REDIRECT)
 
 
-@app.route("/logout", methods=["GET"])
+@app.route("/logout", methods=["GET", "POST"])
 def logout():
+    logout_user()
     session.clear()
     return redirect("/")
 
@@ -927,5 +983,5 @@ def schedframe():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
-    # manager.run()
+    # app.run(debug=True, host="0.0.0.0")
+    manager.run()
