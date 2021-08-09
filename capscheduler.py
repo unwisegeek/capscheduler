@@ -698,7 +698,7 @@ def schedframe():
                                 ),
                             }
                         ]
-                except ValueError:
+                except AttributeError:
                     new_content += [
                         {
                             "date": datetime.strftime(
