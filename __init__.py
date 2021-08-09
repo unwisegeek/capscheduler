@@ -52,7 +52,7 @@ def result_length(set):
     counter = 0
     while True:
         try:
-            len(set[counter].eventId)
+            type(set[counter].eventId)
             counter += 1
         except IndexError:
             break
@@ -571,7 +571,7 @@ def login():
     if userName and userPass:
         userobj = User.query.filter_by(userEmail=userName)
         try:
-            len(userobj[0].userId)
+            type(userobj[0].userId)
         except IndexError:
             return redirect(LOGIN_ERROR_REDIRECT)
         salt = userobj[0].userPass[64:96]
