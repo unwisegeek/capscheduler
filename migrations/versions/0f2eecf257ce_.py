@@ -29,7 +29,7 @@ def upgrade():
     )
     op.create_unique_constraint(None, "users", ["userEmail"])
     op.create_unique_constraint(None, "users", ["userPass"])
-    # ### end Alembic commands ###
+    ### end Alembic commands ###
 
 
 def downgrade():
