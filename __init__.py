@@ -19,6 +19,7 @@ from flask_sqlalchemy import SQLAlchemy
 from oauthlib.oauth2 import WebApplicationClient
 
 from config import (
+    ADMIN_EMAIL,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     GOOGLE_DISCOVERY_URL,
@@ -64,7 +65,7 @@ sess = Session()
 
 
 # Configure database migratiosn
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, render_as_batch=True)
 manager = Manager(app)
 
 manager.add_command("db", MigrateCommand)
@@ -209,26 +210,15 @@ class User(db.Model):
     userId = db.Column(db.Integer, primary_key=True)
     userFirstName = db.Column(db.String(30), unique=False, nullable=False)
     userLastName = db.Column(db.String(30), unique=False, nullable=False)
-    userOrg = db.Column(db.String(30), unique=False, nullable=True)
     userRank = db.Column(db.String(30), unique=False, nullable=False)
     userEmail = db.Column(db.String(50), unique=True, nullable=False)
-    userPass = db.Column(db.String(128), unique=True, nullable=False)
-    user2FAEnabled = db.Column(
-        db.Integer, unique=False, nullable=False, server_default="0"
-    )
-    user2FAKey = db.Column(db.String(32), unique=True, nullable=True, server_default="")
-    userLoginFails = db.Column(
-        db.Integer, unique=False, nullable=False, server_default="0"
-    )
     userLoginLock = db.Column(
         db.Integer, unique=False, nullable=False, server_default="0"
     )
     userPermissions = db.Column(
         db.String(128), unique=False, nullable=False, server_default="viewer"
     )
-    userProfilePic = db.Column(
-        db.String(256), unique=False, nullable=False, server_default=""
-    )
+    userProfilePic = db.Column(db.String(128), unique=False, nullable=True)
 
     def is_active(self):
         if self.userLoginLock == "0":
@@ -238,6 +228,13 @@ class User(db.Model):
 
     def get_id(self):
         return self.userId
+
+    def get_permissions(self):
+        return self.userPermissions.split(",")
+
+    def has_permission(self, perm):
+        if perm in self.userPermissions:
+            return True
 
 
 @login_manager.user_loader
@@ -319,7 +316,6 @@ def schedule_window():
         userData += [userobj[0].userRank]
         userData += [userobj[0].userFirstName]
         userData += [userobj[0].userLastName]
-        userData += [userobj[0].userOrg]
         userData += [userobj[0].userPermissions]
 
     # Grab variables for 'edit' pageAction
@@ -338,6 +334,7 @@ def schedule_window():
         eventData += [eventobj[0].isEmailSent]
         eventData += [eventobj[0].isEmailConfirmed]
         eventData += [eventobj[0].isEmailThanked]
+        eventData += [eventobj[0].isStated]
 
     if session.get("meetingDate", "-1") != "-1":
         meetingDate = session.get("meetingDate", "-1")
@@ -421,6 +418,100 @@ def schedule_window():
     else:
         # Redirect if the date has not been set.
         return redirect("/")
+
+
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+    # Get GET variables and come back with them in a session.
+    keylist = []
+    for each in request.values.keys():
+        keylist += [each]
+
+    if len(keylist) > 0:
+        for each in request.values.keys():
+            session[each] = request.values.get(each)
+        return redirect("/profile")
+
+    opMode = session.get("mode", "view")
+    pageStatus = session.get("status", "")
+    userId = session.get("userId", False)
+    # userInfo = session.get("userInfo", False)
+
+    if not userId:
+        session.clear()
+        return render_template("login.html", status=pageStatus)
+
+    if opMode in ("view", "edit", "viewall"):
+        userobj = User.query.filter_by(userId=userId).first()
+        userData = []
+        userData += [userobj.userId]
+        userData += [userobj.userRank]
+        userData += [userobj.userFirstName]
+        userData += [userobj.userLastName]
+        userData += [userobj.userEmail]
+        userData += [userobj.userPermissions]
+
+        return render_template(
+            "profile.html",
+            mode=opMode,
+            status=pageStatus,
+            userData=userData,
+        )
+
+
+@app.route("/saveprofile", methods=["GET", "POST"])
+def saveprofile():
+    keylist = []
+    for each in request.values.keys():
+        keylist += [each]
+
+    if len(keylist) > 0:
+        for each in request.values.keys():
+            session[each] = request.values.get(each)
+        return redirect("/saveprofile")
+    # early_session = session
+    trackvar = ""
+    userobj = User.query.filter_by(userId=session["userId"]).first()
+
+    userobj.userFirstName = session["userFirstName"]
+    session.pop("userFirstName")
+    userobj.userLastName = session["userLastName"]
+    session.pop("userLastName")
+    userobj.userRank = session["userRank"]
+    session.pop("userRank")
+
+    perms = []
+    if session.get("viewer", False):
+        trackvar += session.get("viewer")
+        perms += ["viewer"]
+        session.pop("viewer")
+    if session.get("scheduling", False):
+        trackvar += session.get("scheduling")
+        perms += ["scheduling"]
+        session.pop("scheduling")
+    if session.get("commander", False):
+        trackvar += session.get("commander")
+        perms += ["commander"]
+        session.pop("commander")
+    if session.get("editor", False):
+        trackvar += session.get("editor")
+        perms += ["editor"]
+        session.pop("editor")
+    if session.get("admin", False):
+        trackvar += session.get("admin")
+        perms += ["admin"]
+        session.pop("admin")
+    raise Exception(f"{perms} - {trackvar}")
+    perms_str = ""
+    for i in range(0, len(perms)):
+        perms_str += perms[i]
+        if i < len(perms) - 1:
+            perms_str += ","
+
+    userobj.userPermissions = perms_str
+    db.session.commit()
+    session["mode"] = "view"
+    return redirect("/profile")
 
 
 @app.route("/newevent", methods=["GET", "POST"])
@@ -650,9 +741,25 @@ def callback():
             login_user(userobj)
             return redirect("/")
         else:
-            return redirect(
-                "/?status=User not authorized use of this resource. Signup feature coming soon."
+            session["mode"] = "edit"
+            # Create user sketch to be edited
+            if userinfo_response.json().get("email") == ADMIN_EMAIL:
+                perms = "viewer,admin"
+            else:
+                perms = "viewer"
+            newuser = User(
+                userRank="",
+                userFirstName=userinfo_response.json()["given_name"],
+                userLastName=userinfo_response.json()["family_name"],
+                userEmail=userinfo_response.json()["email"],
+                userPermissions=perms,
             )
+            # Commit the DB entry and send them back to the index page with the previous date.
+            db.session.add(newuser)
+            db.session.commit()
+            userobj = User.query.filter_by(userEmail=users_email).first()
+            session["userId"] = userobj.userId
+            return redirect("/profile")
     else:
         return redirect(LOGIN_ERROR_REDIRECT)
 

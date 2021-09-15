@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAP Scheduler</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="topnav">
+    <!-- <div class="leftnav">
+    <form action="/schedule">
+        <input type="date" id="meetingDate" name="meetingDate" value="{{ meetingDate }}" data-date-inline-picker="true">
+        <input type="submit" value="Go">
+    </form>
+    </div> -->
+
+    <div class="centernav">
+        {% if mode in "viewall" %}
+        <a href="/schedule?meetingDate={{ prevDate }}"><<</a>
+        <a href="#">{{ meetingDate }}</a>
+        <a href="/schedule?meetingDate={{ nextDate }}">>></a>
+        {% else %}
+        <p></p>
+        {% endif %}
+    </div>
+    {% if mode in 'view' %}
+    <div class="rightnav">
+        <form action="navmenu-handler" method="post">
+            <input type="hidden" name="referrer" value="profile">
+            <select name="destination" id="destination" onchange="this.form.submit()">
+                <option value="schedule">Schedule</option>
+                <option value="profile" selected>Profile</option>
+                <option value="logout">Logout</option>
+            </select>
+        </form>
+    </div>
+    {% endif %}
+    <div class="centernav">
+        {% if status != '' %}
+        <a href="">Status: {{ status }}</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="loginbox">
+    {% if mode in 'edit' %}
+        <form action="saveprofile" method="post">
+            <table>
+                <tr><td>ID#</td><td><input type="text" size="30" name="userId" value={{ userData[0] }} readonly></td></tr>
+                <tr><td>Rank</td><td><input type="text" size="30" name="userRank" value=""></td></tr>
+                <tr><td>First Name</td><td><input type="text" size="30" name="userFirstName" value={{ userData[2] }} ></td></tr>
+                <tr><td>Last Name</td><td><input type="text" size="30" name="userLastName" value={{ userData[3] }} ></td></tr>
+                <tr><td>Email Address</td><td><input type="text" size="30" name="userEmail" value={{ userData[4] }} readonly></td></tr>
+                <tr>
+                    <td>Permissions</td>
+                    <td style="text-align: right;">
+
+                    <!-- <input type="hidden" name="viewer" value="False"> -->
+                    Viewer <input type="checkbox" name="viewer" value="True" {% if 'viewer' in userData[5] %}checked{% endif %}><br>
+
+                    <!-- <input type="hidden" name="scheduling" value="False"> -->
+                    Scheduling Team Member <input type="checkbox" name="scheduling" value="True" {% if 'scheduling' in userData[5] %}checked{% endif %}><br>
+
+                    <!-- <input type="hidden" name="commander" value="False"> -->
+                    Commander <input type="checkbox" name="commander" value="True" {% if 'commander' in userData[5] %}checked{% endif %}><br>
+
+                    <!-- <input type="hidden" name="editor" value="False"> -->
+                    Event Editor <input type="checkbox" name="editor" value="True" {% if 'editor' in userData[5] %}checked{% endif %}><br>
+
+                    <!-- <input type="hidden" name="admin" value="False"> -->
+                    Administrator <input type="checkbox" name="admin" value="True" {% if 'admin' in userData[5] %}checked{% endif %}><br>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input type="submit" onclick="return confirm('Please confirm your name and rank are accurate.')" value="Submit"></form>
+                        <form action="/" method="post">
+                            <input type="submit" value="Abort">
+                        </form>
+                    </td>
+                </tr>
+            </table>
+    {% endif %}
+    {% if mode == 'view' %}
+        <table>
+            <tr><td>ID#</td><td>{{ userData[0] }}</td></tr>
+            <tr><td>Rank</td><td>{{ userData[1] }}</td></tr>
+            <tr><td>First Name</td><td>{{ userData[2] }}</td></tr>
+            <tr><td>Last Name</td><td>{{ userData[3] }}</td></tr>
+            <tr><td>Email Address</td><td>{{ userData[4] }}</td></tr>
+            <tr><td>Permissions</td><td>{{ userData[5] }}</td></tr>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
