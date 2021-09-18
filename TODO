@@ -20,6 +20,7 @@ Items needed for v1 (and switch to main branch)
 [ ] - Add user permissions (Admin, User)
 [ ] - Add checks to todo.html for Siteviz
 
+
 Future Features
 [ ] - Templates!
 [ ] - Database migrations from one instance to another
@@ -29,6 +30,8 @@ Future Features
 [ ] - Squadron Commander's Deliverables Tracking
 [ ] - Other officer deliverables Tracking
 [ ] - Modularization to make adding additional features easier?
+[ ] - Add Uniform of the Day Planning
+[ ] - Add ability to add a calendar spreadsheet to the Google Sheet
     -- I think this is getting a little out of hand...
 
 Issues
