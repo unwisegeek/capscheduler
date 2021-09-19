@@ -20,6 +20,7 @@ from oauthlib.oauth2 import WebApplicationClient
 
 from config import (
     ADMIN_EMAIL,
+    DB_STRING,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     GOOGLE_DISCOVERY_URL,
@@ -38,7 +39,10 @@ from const import (
 os.chdir(INSTALL_DIR)
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///capscheduler-db/capscheduler.db"
+if DB_STRING == "":
+    raise Exception("Please configure the DB_STRING in config.py.")
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = DB_STRING
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
