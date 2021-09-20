@@ -51,3 +51,7 @@ CONTACT_ACCT_REQS = {
 }
 
 DATEFMT = "%Y-%m-%d"
+
+# These values are updated by the update script. Leave blank.
+BRANCH = ""
+LAST_UPDATED = ""

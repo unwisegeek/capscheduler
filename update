@@ -1,0 +1,22 @@
+#!/bin/bash
+INSTALL_DIR=$1
+if [ "$INSTALL_DIR" = "" ]; then
+    echo "ERROR: Please define the installation directory to be passed as the first argument of the update command."
+    exit 1
+fi
+
+if [ -f "$INSTALL_DIR/capscheduler.py" ]; then
+    cd $INSTALL_DIR
+    RESULT=$(git pull)
+    if [ "$RESULT" == "Already up to date." ]; then
+        exit 1
+    else
+        BRANCH=$(git symbolic-ref --short -q HEAD)
+        UPDATE_TIME=`date`
+        mv const.py const.backup
+        sed "s/LAST_UPDATED = \".*\"/LAST_UPDATED = \"${UPDATE_TIME}\"/g" < const.backup > const.temp
+        sed "s/BRANCH = \".*\"/BRANCH = \"${BRANCH}\"/g" < const.temp > const.py
+        rm const.temp
+        systemctl restart apache2
+    fi
+fi

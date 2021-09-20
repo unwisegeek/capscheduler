@@ -29,11 +29,13 @@ from config import (
     meetingDay,
 )
 from const import (
+    BRANCH,
     CONTACT_ABRVS,
     CONTACT_ACCOUNTS,
     CONTACT_ACCT_REQS,
     DATEFMT,
     DAYNUM,
+    LAST_UPDATED,
     MONTHNUM,
 )
 
@@ -419,6 +421,8 @@ def schedule_window():
             eventId=id,
             session=session,
             userData=userData,
+            branch=BRANCH,
+            last_updated=LAST_UPDATED,
         )
     else:
         # Redirect if the date has not been set.
