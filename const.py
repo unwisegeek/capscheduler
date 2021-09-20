@@ -51,3 +51,6 @@ CONTACT_ACCT_REQS = {
 }
 
 DATEFMT = "%Y-%m-%d"
+
+BRANCH = ""
+LAST_UPDATED = ""
