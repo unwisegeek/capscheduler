@@ -14,7 +14,7 @@ if [ -f "$INSTALL_DIR/capscheduler.py" ]; then
         BRANCH=$(git symbolic-ref --short -q HEAD)
         UPDATE_TIME=`date`
         mv const.py const.backup
-        sed "s/LAST_UPDATED=\"\"/LAST_UPDATED=\"${UPDATE_TIME}\"/g" < const.backup > const.temp
+        sed "s/LAST_UPDATED = \"\"/LAST_UPDATED = \"${UPDATE_TIME}\"/g" < const.backup > const.temp
         sed "s/BRANCH = \"\"/BRANCH = \"${BRANCH}\"/g" < const.temp > const.py
         rm const.temp
     fi
