@@ -506,7 +506,6 @@ def saveprofile():
         trackvar += session.get("admin")
         perms += ["admin"]
         session.pop("admin")
-    raise Exception(f"{perms} - {trackvar}")
     perms_str = ""
     for i in range(0, len(perms)):
         perms_str += perms[i]
