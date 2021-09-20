@@ -18,3 +18,4 @@ if [ -f "$INSTALL_DIR/capscheduler.py" ]; then
         sed "s/BRANCH = \"\"/BRANCH = \"${BRANCH}\"/g" < const.temp > const.py
         rm const.temp
     fi
+fi
