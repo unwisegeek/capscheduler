@@ -1,0 +1,12 @@
+#!/bin/bash
+INSTALL_DIR=
+if [ "$INSTALL_DIR" = "" ]; then
+    echo "Please define the installation directory in CAPSchedule update script"
+    exit 1
+fi
+
+RESULT=$(git pull)
+if [ "$RESULT" != "Already up to date." ]; then
+    echo ""
+    exit
+fi
