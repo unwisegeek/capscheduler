@@ -182,7 +182,7 @@ class Event(db.Model):
     stopTime = db.Column(db.String(5), unique=False, nullable=False)
     eventName = db.Column(db.String(80), unique=False, nullable=False)
     eventLdr = db.Column(db.String(80), unique=False, nullable=False)
-    contactAccount = db.Column(db.String(20), unique=False, nullable=False)
+    contactAccount = db.Column(db.String(40), unique=False, nullable=False)
     contactMinutes = db.Column(db.Integer, unique=False, nullable=False)
     isAgreedTo = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
     isEmailScheduled = db.Column(
@@ -606,9 +606,13 @@ def newevent():
             session.pop("pageAction")
         except ValueError:
             pass
+        except KeyError:
+            pass
         try:
             session.pop("eventId")
         except ValueError:
+            pass
+        except KeyError:
             pass
         # Redirect
         return redirect(
