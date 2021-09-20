@@ -24,6 +24,7 @@ from config import (
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     GOOGLE_DISCOVERY_URL,
+    GOOGLE_REDIRECT_URI,
     INSTALL_DIR,
     meetingDay,
 )
@@ -707,7 +708,7 @@ def login():
 
     request_uri = client.prepare_request_uri(
         auth_endpoint,
-        redirect_uri="http://localhost:5000/callback",
+        redirect_uri=GOOGLE_REDIRECT_URI,
         scope=["openid", "profile", "email"],
     )
     return redirect(request_uri)
