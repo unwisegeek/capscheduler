@@ -31,10 +31,10 @@ Please find the schedule for the meeting occurring on {% meetingDate %} below. P
     </tr>
     <tr>
         {% for row in eventData %}
-        <td>{% row[0] %}</td>
-        <td>{% row[1] %}</td>
-        <td>{% row[2] %}</td>
-        <td>{% row[3] %}</td>
+        <td>{ row[0] }</td>
+        <td>{ row[1] }</td>
+        <td>{ row[2] }</td>
+        <td>{ row[3] }</td>
         {% endfor %}
     </tr>
 </table>
@@ -44,7 +44,7 @@ The MAMCS Scheduling Team
 
 This email was generated automatically by CAPScheduler. Please report any defects to 1s Lt John Madon.
 
-<a href="/schedule?meetingDate={% meetingDate %}">Return</a>
+<a href="/schedule?meetingDate={ meetingDate }">Return</a>
 </p>
 
 {% endblock %}
