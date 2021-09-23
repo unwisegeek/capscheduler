@@ -55,7 +55,7 @@ repos:
         # making isort line length compatible with black
         - "--max-line-length=88"
         # this high to accomodate the todoframe
-        - "--max-complexity=57"
+        - "--max-complexity=90"
         - "--select=B,C,E,F,W,T4,B9"
 
         # these are errors that will be ignored by flake8
