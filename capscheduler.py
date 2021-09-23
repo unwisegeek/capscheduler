@@ -197,6 +197,9 @@ class Event(db.Model):
     isEmailThanked = db.Column(
         db.Integer, unique=False, nullable=False, server_default="0"
     )
+    isOnSiteViz = db.Column(
+        db.Integer, unique=False, nullable=False, server_default="0"
+    )
     isDeleted = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
     isStated = db.Column(db.Integer, unique=False, nullable=False, server_default="0")
 
@@ -341,13 +344,14 @@ def schedule_window():
         eventData += [eventobj[0].isEmailSent]
         eventData += [eventobj[0].isEmailConfirmed]
         eventData += [eventobj[0].isEmailThanked]
+        eventData += [eventobj[0].isOnSiteViz]
         eventData += [eventobj[0].isStated]
 
     if session.get("meetingDate", "-1") != "-1":
         meetingDate = session.get("meetingDate", "-1")
 
         # Account for meetingDate coming back in a different format
-        if meetingDate[3] == "-":  # Month First
+        if meetingDate[2] == "-":  # Month First
             meetingDate = datetime.strptime(meetingDate, DATEFMT)
         else:  # Year First
             meetingDate = datetime.strptime(meetingDate, "%Y-%m-%d")
@@ -386,7 +390,7 @@ def schedule_window():
                 minutes[CONTACT_ABRVS[queryResults[i].contactAccount]] += queryResults[
                     i
                 ].contactMinutes
-                row = "{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}".format(
+                row = "{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|{}".format(
                     queryResults[i].eventId,
                     queryResults[i].eventDate,
                     queryResults[i].startTime,
@@ -398,6 +402,7 @@ def schedule_window():
                     queryResults[i].isEmailScheduled,
                     queryResults[i].isEmailSent,
                     queryResults[i].isEmailConfirmed,
+                    queryResults[i].isOnSiteViz,
                     queryResults[i].isEmailThanked,
                 )
                 sortedQueryResults += [row.split("|")]
@@ -575,6 +580,7 @@ def newevent():
             "isEmailSent",
             "isEmailConfirmed",
             "isEmailThanked",
+            "isOnSiteViz",
         ]:
             data += [isin(each)]
 
@@ -592,6 +598,7 @@ def newevent():
             isEmailSent=data[9],
             isEmailConfirmed=data[10],
             isEmailThanked=data[11],
+            isOnSiteViz=data[12],
             isDeleted=0,
         )
         # Commit the DB entry and send them back to the index page with the previous date.
@@ -673,6 +680,7 @@ def editevent():
     event.isEmailSent = isin("isEmailSent")
     event.isEmailConfirmed = isin("isEmailConfirmed")
     event.isEmailThanked = isin("isEmailThanked")
+    event.isOnSiteViz = isin("isOnSiteViz")
     event.isEmailDeleted = isin("isDeleted")
     db.session.commit()
     try:
@@ -976,6 +984,8 @@ def schedframe():
                         missing_flag_list += ["isAgreedTo"]
                     if eventobj[n].isEmailScheduled != 1:
                         missing_flag_list += ["isEmailScheduled"]
+                    if eventobj[n].isOnSiteViz != 1:
+                        missing_flag_list += ["isOnSiteViz"]
                     for n in range(0, len(missing_flag_list)):
                         if n != len(missing_flag_list):
                             missing_flag_str += "{}, ".format(missing_flag_list[n])

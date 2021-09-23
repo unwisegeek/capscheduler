@@ -86,6 +86,7 @@
         <td id="email"><input type="checkbox" name="isEmailScheduled" value="1" {% if eventData[8] == 1 %}checked{% endif %}></td>
         <td id="email"><input type="checkbox" name="isEmailSent" value="1" {% if eventData[9] == 1 %}checked{% endif %}></td>
         <td id="email"><input type="checkbox" name="isEmailConfirmed" value="1" {% if eventData[10] == 1 %}checked{% endif %}></td>
+        <td id="email"><input type="checkbox" name="isOnSiteViz" value="1" {% if eventData[12] == 1 %]checked{% endif %}></td>
         <td id="email"><input type="checkbox" name="isEmailThanked" value="1" {% if eventData[11] == 1 %}checked{% endif %}></td>
             <input type="hidden" name="eventId" value="{{ eventData[0] }}">
             <input type="hidden" name="isDeleted" value="0">
@@ -163,6 +164,9 @@
                 </td>
                 <td>
                     <input type="checkbox" id="isEmailConfirmed" name="isEmailConfirmed" value="1">
+                </td>
+                <td>
+                    <input type="checkbox" id="isOnSiteViz" name="isOnSiteViz" value="1">
                 </td>
                 <td>
                     <input type="checkbox" id="isEmailThanked" name="isEmailThanked" value="1">
