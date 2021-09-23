@@ -122,8 +122,8 @@
     {% if results|length < 7 %}
         {% for i in range(0, 7 - results|length) %}
             <tr>
-                {% for j in range(0, 10) %}
-                    {% if j < 6 %}
+                {% for j in range(0, 11) %}
+                    {% if j < 5 %}
                         <td id="detail">&nbsp;</td>
                     {% else %}
                         <td id="email">&nbsp;</td>
