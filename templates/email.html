@@ -3,17 +3,37 @@
 {% block head %}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CAP Scheduler Login</title>
+<title>CAP Scheduler Email Generator</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 {% endblock %}
 
 {% block body %}
 <div class="topnav">
     <div class="leftnav">
-        <a href="#">Welcome</a>
+    <form action="/schedule">
+        <input type="date" id="meetingDate" name="meetingDate" value="{{ meetingDate }}" data-date-inline-picker="true">
+        <input type="submit" value="Go">
+    </form>
     </div>
     <div class="centernav">
-        <a href="#">{{ status }}</a>
+        <a href="/schedule?meetingDate={{ prevDate }}"><<</a>
+        <a href="#">{{ meetingDate }}</a>
+        <a href="/schedule?meetingDate={{ nextDate }}">>></a>
+    </div>
+    <div class="rightnav">
+        <form action="navmenu-handler" method="post">
+            <input type="hidden" name="referrer" value="schedule">
+            <select name="destination" id="destination" onchange="this.form.submit()">
+                <option value="schedule" selected>Schedule</option>
+                <option value="profile">Profile</option>
+                <option value="logout">Logout</option>
+            </select>
+        </form>
+    </div>
+    <div class="centernav">
+        {% if status != '' %}
+        <a href="">Status: {{ status }}</a>
+        {% endif %}
     </div>
 </div>
 
