@@ -711,6 +711,12 @@ def email():
     else:
         return redirect("/")
 
+    prevDate = meetingDate + timedelta(-7)
+    prevDate = prevDate.strftime(DATEFMT)
+    nextDate = meetingDate + timedelta(+7)
+    nextDate = nextDate.strftime(DATEFMT)
+    meetingDate = meetingDate.strftime("%Y-%m-%d")
+
     # Get all events for meeting date
     queryResults = Event.query.filter_by(eventDate=meetingDate).order_by(
         Event.startTime
@@ -726,7 +732,13 @@ def email():
                 queryResults[i].eventLdr,
             )
             eventData += [row.split("|")]
-    return render_template("email.html", date=meetingDate, data=eventData)
+    return render_template(
+        "email.html",
+        meetingDate=meetingDate,
+        nextDate=nextDate,
+        prevDate=prevDate,
+        data=eventData,
+    )
 
 
 @app.route("/recalculatestats", methods=["GET", "POST"])
