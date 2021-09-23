@@ -567,12 +567,22 @@ def newevent():
             "contactAccount",
         ]:
             if each == "contactAccount":
-                data += [abrv_to_acct(request.values.get(each))]
+                data[each] = [abrv_to_acct(request.values.get(each))]
             else:
-                data += [request.values.get(each)]
+                data[each] = [request.values.get(each)]
+
+        # Ensure startTime and endTime are converted from HHMM to HH:MM format
+        if len(data["startTime"]) == 4 and ":" not in data["startTime"]:
+            # Time in HHMM format. Rebuild into HH:MM format
+            data["startTime"] = f'{data["startTime"][0:1]}:{data["startTime"][2:3]}'
+        if len(data["stopTime"]) == 4 and ":" not in data["stopTime"]:
+            # Time in HHMM format. Rebuild into HH:MM format
+            data["stopTime"] = f'{data["stopTime"][0:1]}:{data["stopTime"][2:3]}'
 
         # Calculate contact minutes for new events.
-        data += [convert_times_to_minutes(data[2], data[1])]
+        data["contactMinutes"] = [
+            convert_times_to_minutes(data["stopTime"], data["startTime"])
+        ]
 
         for each in [
             "isAgreedTo",
@@ -582,23 +592,23 @@ def newevent():
             "isEmailThanked",
             "isOnSiteViz",
         ]:
-            data += [isin(each)]
+            data["each"] = [isin(each)]
 
         # Create a new DB entry.
         newevent = Event(
-            eventDate=data[0],
-            startTime=data[1],
-            stopTime=data[2],
-            eventName=data[3],
-            eventLdr=data[4],
-            contactAccount=data[5],
-            contactMinutes=data[6],
-            isAgreedTo=data[7],
-            isEmailScheduled=data[8],
-            isEmailSent=data[9],
-            isEmailConfirmed=data[10],
-            isEmailThanked=data[11],
-            isOnSiteViz=data[12],
+            eventDate=data["eventDate"],
+            startTime=data["startTime"],
+            stopTime=data["stopTime"],
+            eventName=data["eventName"],
+            eventLdr=data["eventLdr"],
+            contactAccount=data["contactAccount"],
+            contactMinutes=data["contactMinutes"],
+            isAgreedTo=data["isAgreedTo"],
+            isEmailScheduled=data["isEmailScheduled"],
+            isEmailSent=data["isEmailSent"],
+            isEmailConfirmed=data["isEmailConfirmed"],
+            isEmailThanked=data["isEmailThanked"],
+            isOnSiteViz=data["isOnSiteViz"],
             isDeleted=0,
         )
         # Commit the DB entry and send them back to the index page with the previous date.
