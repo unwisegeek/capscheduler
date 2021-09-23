@@ -574,10 +574,20 @@ def newevent():
         # Ensure startTime and endTime are converted from HHMM to HH:MM format
         if len(data["startTime"]) == 4 and ":" not in data["startTime"]:
             # Time in HHMM format. Rebuild into HH:MM format
-            data["startTime"] = f'{data["startTime"][0:1]}:{data["startTime"][2:3]}'
+            data["startTime"] = "{}{}:{}{}".format(
+                data["startTime"][0],
+                data["startTime"][1],
+                data["startTime"][2],
+                data["startTime"][3],
+            )
         if len(data["stopTime"]) == 4 and ":" not in data["stopTime"]:
             # Time in HHMM format. Rebuild into HH:MM format
-            data["stopTime"] = f'{data["stopTime"][0:1]}:{data["stopTime"][2:3]}'
+            data["stopTime"] = "{}{}:{}{}".format(
+                data["stopTime"][0],
+                data["stopTime"][1],
+                data["stopTime"][2],
+                data["stopTime"][3],
+            )
 
         # Calculate contact minutes for new events.
         data["contactMinutes"] = [
