@@ -111,7 +111,7 @@ def count_stats(year, month, acct, mins):
     """
     Adds contact hours to stats db
 
-    Requires: year, month, acct, mins
+    Requires: year(int), month(int), acct(str), mins(int)
     """
     try:
         statsobj = (
@@ -627,7 +627,7 @@ def newevent():
         newevent = ""
         # Add to statistics DB
         date = data["eventDate"].split("-")
-        count_stats(date[0], date[1], data[5], data[6])
+        count_stats(date[0], date[1], data["contactAccount"], data["contactMinutes"])
         # Clear session variables that no longer need to be there
         try:
             session.pop("pageAction")
