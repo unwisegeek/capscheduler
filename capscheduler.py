@@ -557,7 +557,7 @@ def newevent():
             reqVarsExist = False
     if reqVarsExist:
         # Create list of variable values.
-        data = []
+        data = {}
         for each in [
             "eventDate",
             "startTime",
