@@ -725,8 +725,8 @@ def email():
                 queryResults[i].eventName,
                 queryResults[i].eventLdr,
             )
-            eventData += row.split("|")
-    return render_template("email.html", meetingDate=meetingDate, eventData=eventData)
+            eventData += [row.split("|")]
+    return render_template("email.html", date=meetingDate, data=eventData)
 
 
 @app.route("/recalculatestats", methods=["GET", "POST"])

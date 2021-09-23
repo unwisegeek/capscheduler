@@ -20,7 +20,7 @@
 <p>
 Hello,
 
-Please find the schedule for the meeting occurring on {% meetingDate %} below. Please let us know if you have any questions:
+Please find the schedule for the meeting occurring on { date } below. Please let us know if you have any questions:
 
 <table>
     <tr>
@@ -30,7 +30,7 @@ Please find the schedule for the meeting occurring on {% meetingDate %} below. P
         <th>Leader</th>
     </tr>
     <tr>
-        {% for row in eventData %}
+        {% for row in data %}
         <td>{ row[0] }</td>
         <td>{ row[1] }</td>
         <td>{ row[2] }</td>
@@ -44,7 +44,7 @@ The MAMCS Scheduling Team
 
 This email was generated automatically by CAPScheduler. Please report any defects to 1s Lt John Madon.
 
-<a href="/schedule?meetingDate={ meetingDate }">Return</a>
+<a href="/schedule?meetingDate={ date }">Return</a>
 </p>
 
 {% endblock %}
