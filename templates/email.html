@@ -10,19 +10,19 @@
 {% block body %}
 <div class="topnav">
     <div class="leftnav">
-    <form action="/schedule">
+    <form action="/email">
         <input type="date" id="meetingDate" name="meetingDate" value="{{ meetingDate }}" data-date-inline-picker="true">
         <input type="submit" value="Go">
     </form>
     </div>
     <div class="centernav">
-        <a href="/schedule?meetingDate={{ prevDate }}"><<</a>
+        <a href="/email?meetingDate={{ prevDate }}"><<</a>
         <a href="#">{{ meetingDate }}</a>
-        <a href="/schedule?meetingDate={{ nextDate }}">>></a>
+        <a href="/email?meetingDate={{ nextDate }}">>></a>
     </div>
     <div class="rightnav">
         <form action="navmenu-handler" method="post">
-            <input type="hidden" name="referrer" value="schedule">
+            <input type="hidden" name="referrer" value="email">
             <select name="destination" id="destination" onchange="this.form.submit()">
                 <option value="schedule" selected>Schedule</option>
                 <option value="profile">Profile</option>
