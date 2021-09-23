@@ -626,7 +626,7 @@ def newevent():
         db.session.commit()
         newevent = ""
         # Add to statistics DB
-        date = data[0].split("-")
+        date = data["eventDate"].split("-")
         count_stats(date[0], date[1], data[5], data[6])
         # Clear session variables that no longer need to be there
         try:
