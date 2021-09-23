@@ -567,9 +567,9 @@ def newevent():
             "contactAccount",
         ]:
             if each == "contactAccount":
-                data[each] = [abrv_to_acct(request.values.get(each))]
+                data[each] = abrv_to_acct(request.values.get(each))
             else:
-                data[each] = [request.values.get(each)]
+                data[each] = request.values.get(each)
 
         # Ensure startTime and endTime are converted from HHMM to HH:MM format
         if len(data["startTime"]) == 4 and ":" not in data["startTime"]:
