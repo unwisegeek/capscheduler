@@ -694,6 +694,41 @@ def editevent():
     return redirect("/schedule?meetingDate={}&status={}".format(meetingDate, status))
 
 
+@app.route("/email", methods=["GET", "POST"])
+def email():
+    # Get GET variables and come back with them in a session.
+    keylist = []
+    for each in request.values.keys():
+        keylist += [each]
+
+    if len(keylist) > 0:
+        for each in request.values.keys():
+            session[each] = request.values.get(each)
+        return redirect("/email")
+
+    if session.get("meetingDate", "-1") != "-1":
+        meetingDate = session.get("meetingDate", "-1")
+    else:
+        return redirect("/")
+
+    # Get all events for meeting date
+    queryResults = Event.query.filter_by(eventDate=meetingDate).order_by(
+        Event.startTime
+    )
+    eventData = []
+    counter = result_length(queryResults)
+    for i in range(0, counter):
+        if queryResults[i].isDeleted != 1:
+            row = "{}|{}|{}|{}".format(
+                queryResults[i].startTime,
+                queryResults[i].stopTime,
+                queryResults[i].eventName,
+                queryResults[i].eventLdr,
+            )
+            eventData += row.split("|")
+    return render_template("email.html", meetingDate=meetingDate, eventData=eventData)
+
+
 @app.route("/recalculatestats", methods=["GET", "POST"])
 def recalcstats():
     meetingDate = request.values.get("meetingDate")

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAP Scheduler Login</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="topnav">
+    <div class="leftnav">
+        <a href="#">Welcome</a>
+    </div>
+    <div class="centernav">
+        <a href="#">{{ status }}</a>
+    </div>
+</div>
+
+<p>
+Hello,
+
+Please find the schedule for the meeting occurring on {% meetingDate %} below. Please let us know if you have any questions:
+
+<table>
+    <tr>
+        <th>From</th>
+        <th>To</th>
+        <th>Event</th>
+        <th>Leader</th>
+    </tr>
+    <tr>
+        {% for row in eventData %}
+        <td>{% row[0] %}</td>
+        <td>{% row[1] %}</td>
+        <td>{% row[2] %}</td>
+        <td>{% row[3] %}</td>
+        {% endfor %}
+    </tr>
+</table>
+
+Kind Regards,
+The MAMCS Scheduling Team
+
+This email was generated automatically by CAPScheduler. Please report any defects to 1s Lt John Madon.
+
+<a href="/schedule?meetingDate={% meetingDate %}">Return</a>
+</p>
+
+{% endblock %}
