@@ -18,9 +18,7 @@
 </div>
 
 <p>
-Hello,
-
-Please find the schedule for the meeting occurring on { date } below. Please let us know if you have any questions:
+Hello,<br><br>Please find the schedule for the meeting occurring on {{ date }} below. Please let us know if you have any questions:<br><br>
 
 <table>
     <tr>
@@ -29,22 +27,22 @@ Please find the schedule for the meeting occurring on { date } below. Please let
         <th>Event</th>
         <th>Leader</th>
     </tr>
-    <tr>
-        {% for row in data %}
-        <td>{ row[0] }</td>
-        <td>{ row[1] }</td>
-        <td>{ row[2] }</td>
-        <td>{ row[3] }</td>
+    {% for row in data %}
+        <tr>
+            <td>{{ row[0] }}</td>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[2] }}</td>
+            <td>{{ row[3] }}</td>
+        </tr>
         {% endfor %}
-    </tr>
 </table>
+<br>
+Kind Regards,<br>
+The MAMCS Scheduling Team<br><br>
 
-Kind Regards,
-The MAMCS Scheduling Team
+This email was generated automatically by CAPScheduler. Please report any defects to 1s Lt John Madon.<br><br>
 
-This email was generated automatically by CAPScheduler. Please report any defects to 1s Lt John Madon.
-
-<a href="/schedule?meetingDate={ date }">Return</a>
+<a href="/schedule?meetingDate={{ date }}">Return</a>
 </p>
 
 {% endblock %}
