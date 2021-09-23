@@ -18,7 +18,7 @@ Items needed for v1 (and switch to main branch)
 [X] - Add Two-Factor Authentication (implemented via OAuth2 and Google)
 [ ] - Add ability to specify admin user(s)
 [ ] - Add user permissions (Admin, User)
-[ ] - Add checks to todo.html for Siteviz
+[X] - Add checks to todo.html for Siteviz
 
 
 Future Features
