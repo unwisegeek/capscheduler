@@ -590,9 +590,9 @@ def newevent():
             )
 
         # Calculate contact minutes for new events.
-        data["contactMinutes"] = [
-            convert_times_to_minutes(data["stopTime"], data["startTime"])
-        ]
+        data["contactMinutes"] = convert_times_to_minutes(
+            data["stopTime"], data["startTime"]
+        )
 
         for each in [
             "isAgreedTo",
