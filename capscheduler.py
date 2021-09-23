@@ -711,6 +711,10 @@ def email():
     else:
         return redirect("/")
 
+    pageStatus = session.get("status", "")
+    if pageStatus != "":
+        session.pop("status")
+
     tmpdate = datetime.strptime(meetingDate, DATEFMT)
     prevDate = tmpdate + timedelta(-7)
     prevDate = prevDate.strftime(DATEFMT)
@@ -738,6 +742,7 @@ def email():
         meetingDate=meetingDate,
         nextDate=nextDate,
         prevDate=prevDate,
+        status=pageStatus,
         data=eventData,
     )
 
