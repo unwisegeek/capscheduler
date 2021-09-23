@@ -716,7 +716,7 @@ def email():
     prevDate = prevDate.strftime(DATEFMT)
     nextDate = tmpdate + timedelta(+7)
     nextDate = nextDate.strftime(DATEFMT)
-    meetingDate = meetingDate.strftime("%Y-%m-%d")
+    meetingDate = datetime.strftime(tmpdate, "%Y-%m-%d")
 
     # Get all events for meeting date
     queryResults = Event.query.filter_by(eventDate=meetingDate).order_by(
