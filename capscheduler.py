@@ -711,7 +711,7 @@ def email():
     else:
         return redirect("/")
 
-    tmpdate = meetingDate.strptime(DATEFMT)
+    tmpdate = datetime.strptime(meetingDate, DATEFMT)
     prevDate = tmpdate + timedelta(-7)
     prevDate = prevDate.strftime(DATEFMT)
     nextDate = tmpdate + timedelta(+7)
