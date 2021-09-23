@@ -865,7 +865,7 @@ def schedframe():
                         difference = CONTACT_ACCT_REQS[acct] - statsobj.contactMinutes
                         new_content += [
                             {
-                                "date": get_first_meeting_day(month, year).strptime(
+                                "date": get_first_meeting_day(month, year).strftime(
                                     DATEFMT
                                 ),
                                 "item": "HRS: Requires {} additional {} minutes.".format(
