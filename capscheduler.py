@@ -592,7 +592,7 @@ def newevent():
             "isEmailThanked",
             "isOnSiteViz",
         ]:
-            data["each"] = [isin(each)]
+            data["each"] = isin(each)
 
         # Create a new DB entry.
         newevent = Event(
