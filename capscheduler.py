@@ -857,17 +857,17 @@ def recalcstats():
     )
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    # google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
-    # auth_endpoint = google_provider_cfg["authorization_endpoint"]
+# @app.route("/login", methods=["GET", "POST"])
+# def login():
+#     # google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
+#     # auth_endpoint = google_provider_cfg["authorization_endpoint"]
 
-    # request_uri = client.prepare_request_uri(
-    #     auth_endpoint,
-    #     redirect_uri=GOOGLE_REDIRECT_URI,
-    # )
-    # return redirect(request_uri)
-    return redirect(url_for("login"))
+#     # request_uri = client.prepare_request_uri(
+#     #     auth_endpoint,
+#     #     redirect_uri=GOOGLE_REDIRECT_URI,
+#     # )
+#     # return redirect(request_uri)
+#     return redirect(url_for("login"))
 
 
 @app.route("/callback", methods=["GET"])
