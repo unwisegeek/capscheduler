@@ -281,6 +281,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+@oauth_authorized.connect_via(GOOGLE_BLUEPRINT)
 def google_logged_in(blueprint, token):
     if not token:
         flash("Failed to log in.", category="error")
