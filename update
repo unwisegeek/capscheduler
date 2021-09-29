@@ -17,6 +17,7 @@ if [ -f "$INSTALL_DIR/capscheduler.py" ]; then
         sed "s/LAST_UPDATED = \".*\"/LAST_UPDATED = \"${UPDATE_TIME}\"/g" < const.backup > const.temp
         sed "s/BRANCH = \".*\"/BRANCH = \"${BRANCH}\"/g" < const.temp > const.py
         rm const.temp
+        source $INSTALL_DIR/venv/bin/activate
         pip3 install -r requirements.txt
         systemctl restart apache2
     fi
