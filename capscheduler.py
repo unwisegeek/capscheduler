@@ -273,9 +273,11 @@ GOOGLE_BLUEPRINT = make_google_blueprint(
 
 @app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/login")
 @login_manager.user_loader
-def load_user(email):
-    user = User.query.filter_by(userEmail=str(email)).first()
-    return user
+# def load_user(email):
+#     user = User.query.filter_by(userEmail=str(email)).first()
+#     return user
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 def google_logged_in(blueprint, token):
