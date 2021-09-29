@@ -263,13 +263,13 @@ class OAuth(OAuthConsumerMixin, db.Model):
 GOOGLE_BLUEPRINT = make_google_blueprint(
     client_id=GOOGLE_CLIENT_ID,
     client_secret=GOOGLE_CLIENT_SECRET,
-    redirect_url=GOOGLE_REDIRECT_URI,
+    # redirect_url=GOOGLE_REDIRECT_URI,
     scope=["openid", "profile", "email"],
     storage=SQLAlchemyStorage(OAuth, db.session, user=current_user),
     hosted_domain="mariettacap.org",
 )
 
-app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/google/login")
+app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/login")
 login_manager.init_app(app)
 
 
