@@ -67,7 +67,6 @@ else:
 
 # Flask User session management
 login_manager = LoginManager()
-login_manager.init_app(app)
 login_manager.login_view = "google.login"
 
 # Oauth 2 Client Setup
@@ -270,8 +269,10 @@ GOOGLE_BLUEPRINT = make_google_blueprint(
     hosted_domain="mariettacap.org",
 )
 
+app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/login")
+login_manager.init_app(app)
 
-@app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/login")
+
 @login_manager.user_loader
 # def load_user(email):
 #     user = User.query.filter_by(userEmail=str(email)).first()
