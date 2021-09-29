@@ -67,7 +67,7 @@ else:
 
 # Flask User session management
 login_manager = LoginManager()
-login_manager.login_view = "google.login"
+login_manager.login_view = "login"
 
 # Oauth 2 Client Setup
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
