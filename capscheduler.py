@@ -867,7 +867,7 @@ def login():
     #     redirect_uri=GOOGLE_REDIRECT_URI,
     # )
     # return redirect(request_uri)
-    return redirect(url_for("google.login"))
+    return redirect(url_for("login"))
 
 
 @app.route("/callback", methods=["GET"])
