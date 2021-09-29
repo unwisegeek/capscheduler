@@ -4,9 +4,13 @@ import os
 from datetime import date, datetime, timedelta
 
 import requests
-from flask import Flask, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_dance.consumer import oauth_authorized, oauth_error
+from flask_dance.consumer.storage.sqla import OAuthConsumerMixin, SQLAlchemyStorage
+from flask_dance.contrib.google import make_google_blueprint
 from flask_login import (
     LoginManager,
+    UserMixin,
     current_user,
     login_required,
     login_user,
@@ -17,14 +21,17 @@ from flask_script import Manager, Server
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from oauthlib.oauth2 import WebApplicationClient
+from sqlalchemy.orm.exc import NoResultFound
 
 from config import (
     ADMIN_EMAIL,
     DB_STRING,
+    GOOGLE_AUTH_URI,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     GOOGLE_DISCOVERY_URL,
     GOOGLE_REDIRECT_URI,
+    GOOGLE_TOKEN_URI,
     INSTALL_DIR,
     meetingDay,
 )
@@ -61,6 +68,7 @@ else:
 # Flask User session management
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "google.login"
 
 # Oauth 2 Client Setup
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
@@ -247,10 +255,66 @@ class User(db.Model):
             return True
 
 
+class OAuth(OAuthConsumerMixin, db.Model):
+    provider_user_id = db.Column(db.String(256), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.userId), nullable=False)
+    user = db.relationship(User)
+
+
+GOOGLE_BLUEPRINT = make_google_blueprint(
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET,
+    redirect_url=GOOGLE_REDIRECT_URI,
+    scope=["openid", "profile", "email"],
+    storage=SQLAlchemyStorage(OAuth, db.session, user=current_user),
+    hosted_domain="mariettacap.org",
+)
+
+
 @login_manager.user_loader
 def load_user(email):
     user = User.query.filter_by(userEmail=str(email)).first()
     return user
+
+
+def google_logged_in(blueprint, token):
+    if not token:
+        flash("Failed to log in.", category="error")
+        return False
+
+    resp = blueprint.session.get("/oauth2/v1/userinfo")
+    if not resp.ok:
+        msg = "Failed to fetch user info."
+        flash(msg, category="error")
+        return False
+
+    info = resp.json()
+    user_id = info["id"]
+
+    # Find this OAuth Token in the database or create it
+    query = OAuth.query.filter_by(provider=blueprint.name, provider_user_id=user_id)
+    try:
+        oauth = query.one()
+    except NoResultFound:
+        oauth = OAuth(provider=blueprint.name, provider_user_id=user_id, token=token)
+
+    if oauth.user:
+        login_user(oauth.user)
+        flash("Successfully signed in.")
+    else:
+        user = User(userEmail=["email"])
+        oauth.user = user
+        db.session.add_all([user, oauth])
+        db.session.commit()
+        login_user(user)
+        flash("Successfully signed in.")
+    return False
+
+
+@oauth_error.connect_via(GOOGLE_BLUEPRINT)
+def google_error(blueprint, message, response):
+    msg = f"OAuth error from {app.name}! message={message} response={response}"
+    flash(msg, category="error")
 
 
 # Initialize the database file if one does not exist.
@@ -791,15 +855,15 @@ def recalcstats():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
-    auth_endpoint = google_provider_cfg["authorization_endpoint"]
+    # google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
+    # auth_endpoint = google_provider_cfg["authorization_endpoint"]
 
-    request_uri = client.prepare_request_uri(
-        auth_endpoint,
-        redirect_uri=GOOGLE_REDIRECT_URI,
-        scope=["openid", "profile", "email"],
-    )
-    return redirect(request_uri)
+    # request_uri = client.prepare_request_uri(
+    #     auth_endpoint,
+    #     redirect_uri=GOOGLE_REDIRECT_URI,
+    # )
+    # return redirect(request_uri)
+    return redirect(url_for("google.login"))
 
 
 @app.route("/callback", methods=["GET"])
