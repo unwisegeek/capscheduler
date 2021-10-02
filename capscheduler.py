@@ -263,7 +263,7 @@ class OAuth(OAuthConsumerMixin, db.Model):
 GOOGLE_BLUEPRINT = make_google_blueprint(
     client_id=GOOGLE_CLIENT_ID,
     client_secret=GOOGLE_CLIENT_SECRET,
-    # redirect_url=GOOGLE_REDIRECT_URI,
+    redirect_url=GOOGLE_REDIRECT_URI,
     scope=["openid", "profile", "email"],
     storage=SQLAlchemyStorage(OAuth, db.session, user=current_user),
     redirect_to="schedule",
