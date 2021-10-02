@@ -266,6 +266,7 @@ GOOGLE_BLUEPRINT = make_google_blueprint(
     # redirect_url=GOOGLE_REDIRECT_URI,
     scope=["openid", "profile", "email"],
     storage=SQLAlchemyStorage(OAuth, db.session, user=current_user),
+    redirect_to="schedule",
     hosted_domain="mariettacap.org",
 )
 
