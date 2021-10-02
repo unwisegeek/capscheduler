@@ -270,7 +270,7 @@ GOOGLE_BLUEPRINT = make_google_blueprint(
     hosted_domain="mariettacap.org",
 )
 
-app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/login")
+app.register_blueprint(GOOGLE_BLUEPRINT)
 login_manager.init_app(app)
 
 
