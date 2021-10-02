@@ -263,14 +263,14 @@ class OAuth(OAuthConsumerMixin, db.Model):
 GOOGLE_BLUEPRINT = make_google_blueprint(
     client_id=GOOGLE_CLIENT_ID,
     client_secret=GOOGLE_CLIENT_SECRET,
-    redirect_url=GOOGLE_REDIRECT_URI,
+    # redirect_url=GOOGLE_REDIRECT_URI,
     scope=["openid", "profile", "email"],
     storage=SQLAlchemyStorage(OAuth, db.session, user=current_user),
     redirect_to="schedule",
     hosted_domain="mariettacap.org",
 )
 
-app.register_blueprint(GOOGLE_BLUEPRINT)
+app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/login/google")
 login_manager.init_app(app)
 
 
@@ -859,17 +859,17 @@ def recalcstats():
     )
 
 
-# @app.route("/login", methods=["GET", "POST"])
-# def login():
-#     # google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
-#     # auth_endpoint = google_provider_cfg["authorization_endpoint"]
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    # google_provider_cfg = requests.get(GOOGLE_DISCOVERY_URL).json()
+    # auth_endpoint = google_provider_cfg["authorization_endpoint"]
 
-#     # request_uri = client.prepare_request_uri(
-#     #     auth_endpoint,
-#     #     redirect_uri=GOOGLE_REDIRECT_URI,
-#     # )
-#     # return redirect(request_uri)
-#     return redirect(url_for("login"))
+    # request_uri = client.prepare_request_uri(
+    #     auth_endpoint,
+    #     redirect_uri=GOOGLE_REDIRECT_URI,
+    # )
+    # return redirect(request_uri)
+    return redirect(url_for("login"))
 
 
 @app.route("/callback", methods=["GET"])
