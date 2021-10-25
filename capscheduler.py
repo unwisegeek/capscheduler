@@ -7,7 +7,7 @@ import requests
 from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin, SQLAlchemyStorage
-from flask_dance.contrib.google import make_google_blueprint
+from flask_dance.contrib.google import google, make_google_blueprint
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -269,8 +269,7 @@ GOOGLE_BLUEPRINT = make_google_blueprint(
     redirect_to="schedule",
     hosted_domain="mariettacap.org",
 )
-
-app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/google")
+app.register_blueprint(GOOGLE_BLUEPRINT, url_prefix="/")
 login_manager.init_app(app)
 
 
@@ -331,37 +330,40 @@ if not os.path.exists("./capscheduler.db"):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # Get GET variables and come back with them in a session.
-    keylist = []
-    for each in request.values.keys():
-        keylist += [each]
+    # # Get GET variables and come back with them in a session.
+    # keylist = []
+    # for each in request.values.keys():
+    #     keylist += [each]
 
-    if len(keylist) > 0:
-        for each in request.values.keys():
-            session[each] = request.values.get(each)
-        return redirect("/")
+    # if len(keylist) > 0:
+    #     for each in request.values.keys():
+    #         session[each] = request.values.get(each)
+    #     return redirect("/")
 
-    pageStatus = session.get("status", "")
-    if not session.get("userId", False):
-        session.clear()
-        return render_template("login.html", status=pageStatus)
-    # If the user arrives at the index page with a date, use it.
-    if (
-        "meetingDate" in request.values or session.get("meetingDate", "-1") != "-1"
-    ):  # Date exists in POST or GET
-        meetingDate = session.get("meetingDate", "-1")
-        if meetingDate == "-1":
-            meetingDate = request.values.get("meetingDate")
-            session["meetingDate"] = meetingDate
-            return redirect("/schedule")
-        return redirect("/schedule")
-    else:  # Pick the next day that coincides with the meeting day.
-        nextMeetingDay = date.today()
-        while nextMeetingDay.weekday() != DAYNUM[meetingDay]:
-            nextMeetingDay += timedelta(1)
-        meetingDate = nextMeetingDay.strftime(DATEFMT)
-        session["meetingDate"] = meetingDate
-        return redirect("/schedule")
+    # pageStatus = session.get("status", "")
+    # if not session.get("userId", False):
+    #     session.clear()
+    #     return render_template("login.html", status=pageStatus)
+    # # If the user arrives at the index page with a date, use it.
+    # if (
+    #     "meetingDate" in request.values or session.get("meetingDate", "-1") != "-1"
+    # ):  # Date exists in POST or GET
+    #     meetingDate = session.get("meetingDate", "-1")
+    #     if meetingDate == "-1":
+    #         meetingDate = request.values.get("meetingDate")
+    #         session["meetingDate"] = meetingDate
+    #         return redirect("/schedule")
+    #     return redirect("/schedule")
+    # else:  # Pick the next day that coincides with the meeting day.
+    #     nextMeetingDay = date.today()
+    #     while nextMeetingDay.weekday() != DAYNUM[meetingDay]:
+    #         nextMeetingDay += timedelta(1)
+    #     meetingDate = nextMeetingDay.strftime(DATEFMT)
+    #     session["meetingDate"] = meetingDate
+    #     return redirect("/schedule")
+    if not google.authorized:
+        return redirect(url_for("google.login"))
+    redirect("/schedule")
 
 
 @app.route("/schedule", methods=["GET", "POST"])
@@ -436,7 +438,7 @@ def schedule_window():
         queryResults = Event.query.filter_by(eventDate=meetingDate).order_by(
             Event.startTime
         )
-        date = meetingDate.split("-")
+        mdate = meetingDate.split("-")
         sortedQueryResults = []
         minutes = {}
         monthly_minutes = []
@@ -445,8 +447,8 @@ def schedule_window():
         for account in CONTACT_ACCOUNTS:
             minutes[CONTACT_ABRVS[account]] = 0
             queryStats = (
-                MonthlyStats.query.filter_by(statsYear=int(date[0]))
-                .filter_by(statsMonth=int(date[1]))
+                MonthlyStats.query.filter_by(statsYear=int(mdate[0]))
+                .filter_by(statsMonth=int(mdate[1]))
                 .filter_by(contactAccount=account)
             )
             try:
@@ -696,8 +698,8 @@ def newevent():
         db.session.commit()
         newevent = ""
         # Add to statistics DB
-        date = data["eventDate"].split("-")
-        count_stats(date[0], date[1], data["contactAccount"], data["contactMinutes"])
+        mdate = data["eventDate"].split("-")
+        count_stats(mdate[0], mdate[1], data["contactAccount"], data["contactMinutes"])
         # Clear session variables that no longer need to be there
         try:
             session.pop("pageAction")
@@ -726,8 +728,8 @@ def deleteevent():
     id = request.values.get("eventId")
     eventobj = Event.query.filter_by(eventId=int(id)).first()
     eventobj.isDeleted = 1
-    date = eventobj.eventDate.split("-")
-    uncount_stats(date[0], date[1], eventobj.contactAccount, eventobj.contactMinutes)
+    mdate = eventobj.eventDate.split("-")
+    uncount_stats(mdate[0], mdate[1], eventobj.contactAccount, eventobj.contactMinutes)
     db.session.commit()
     status = "Event Deleted"
     return redirect("/schedule?meetingDate={}&status={}".format(meetingDate, status))
@@ -845,10 +847,10 @@ def recalcstats():
 
     for i in range(0, result_length(eventQuery)):
         if eventQuery[i].isDeleted != 1:
-            date = eventQuery[i].eventDate.split("-")
+            mdate = eventQuery[i].eventDate.split("-")
             count_stats(
-                date[0],
-                date[1],
+                mdate[0],
+                mdate[1],
                 eventQuery[i].contactAccount,
                 eventQuery[i].contactMinutes,
             )  # year, month, acct, mins

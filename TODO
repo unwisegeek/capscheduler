@@ -10,6 +10,7 @@ TODO
 Items needed for v1 (and switch to main branch)
 [X] - Change bottom iframe to "on demand" to save page loading time by not loading todo unless needed.
 [ ] - Add page that is easily added to email
+[ ] - Take page above and send it out as an email to a configurable address.
 [ ] - Add configuration page
     -- Maybe switch configuration to ini style with configparser or flat JSON file
 [ ] - Add initial configuration with a one-time use endpoint, maybe?
